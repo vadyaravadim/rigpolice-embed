@@ -1,0 +1,7 @@
+{
+  "plugins": ["."],
+  "port": 9400,
+  "config": {
+    "WP_DEBUG": true
+  }
+}
