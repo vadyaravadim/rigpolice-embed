@@ -156,13 +156,9 @@
 					el( cmp.Spinner )
 				);
 			} else {
-				var toolOptions = [
-					{ label: __( 'Select a tool…', 'rigpolice-embed' ), value: '' },
-				].concat(
-					tools.map( function ( t ) {
-						return { label: t.title + ' (' + t.category + ')', value: t.slug };
-					} )
-				);
+				var toolOptions = tools.map( function ( t ) {
+					return { label: t.title + ' (' + t.category + ')', value: t.slug };
+				} );
 
 				var selected = null;
 				for ( var i = 0; i < tools.length; i++ ) {
@@ -185,14 +181,18 @@
 							'rigpolice-embed'
 					  );
 
-				var toolSelect = el( cmp.SelectControl, {
+				// ComboboxControl (not SelectControl): a searchable input — the tool list is long, so
+				// filter-as-you-type beats scrolling. Built-in label filtering; reset clears to null.
+				var toolSelect = el( cmp.ComboboxControl, {
 					label: __( 'Tool', 'rigpolice-embed' ),
 					value: tool,
 					options: toolOptions,
+					placeholder: __( 'Search tools…', 'rigpolice-embed' ),
 					// Reset the game pair when the tool changes — from/to only apply to the converter.
 					onChange: function ( value ) {
-						setAttributes( { tool: value, from: '', to: '' } );
+						setAttributes( { tool: value || '', from: '', to: '' } );
 					},
+					__next40pxDefaultSize: true,
 					__nextHasNoMarginBottom: true,
 				} );
 
@@ -211,32 +211,33 @@
 					} else if ( games === null ) {
 						pairPicker = el( cmp.Spinner );
 					} else {
-						var gameOptions = [
-							{ label: __( 'Any (no preset)', 'rigpolice-embed' ), value: '' },
-						].concat(
-							games.map( function ( g ) {
-								return { label: g.name, value: g.slug };
-							} )
-						);
+						var gameOptions = games.map( function ( g ) {
+							return { label: g.name, value: g.slug };
+						} );
+						// Searchable pair pickers; the reset (X) clears back to "any game, no preset".
 						pairPicker = el(
 							Fragment,
 							null,
-							el( cmp.SelectControl, {
+							el( cmp.ComboboxControl, {
 								label: __( 'From game', 'rigpolice-embed' ),
 								value: from,
 								options: gameOptions,
+								placeholder: __( 'Any game (no preset)', 'rigpolice-embed' ),
 								onChange: function ( value ) {
-									setAttributes( { from: value } );
+									setAttributes( { from: value || '' } );
 								},
+								__next40pxDefaultSize: true,
 								__nextHasNoMarginBottom: true,
 							} ),
-							el( cmp.SelectControl, {
+							el( cmp.ComboboxControl, {
 								label: __( 'To game', 'rigpolice-embed' ),
 								value: to,
 								options: gameOptions,
+								placeholder: __( 'Any game (no preset)', 'rigpolice-embed' ),
 								onChange: function ( value ) {
-									setAttributes( { to: value } );
+									setAttributes( { to: value || '' } );
 								},
+								__next40pxDefaultSize: true,
 								__nextHasNoMarginBottom: true,
 							} )
 						);
