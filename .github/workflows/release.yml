@@ -1,0 +1,57 @@
+name: Release
+
+# Tag-driven release. Push a `v*` tag and this: (1) verifies all four version declarations equal the tag
+# (drift guard), (2) packages the plugin zip (excluding VCS + WP.org assets), (3) publishes a GitHub
+# Release with it. So a release is just: bump the four versions + changelog, commit, then
+# `git tag vX.Y.Z && git push origin vX.Y.Z`.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write # create the release + upload the asset
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The four places the version lives must all match the tag (minus the leading v). Nothing else
+      # keeps them in sync, so this is the single gate against a skewed release — fail loud, don't ship.
+      - name: Verify version consistency
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          BLOCK=$(sed -nE 's/.*"version":[[:space:]]*"([^"]+)".*/\1/p' block.json | head -1)
+          PHP=$(sed -nE 's/.*Version:[[:space:]]*([0-9][0-9.]+).*/\1/p' rigpolice-embed.php | head -1)
+          ASSET=$(sed -nE "s/.*'version'[[:space:]]*=>[[:space:]]*'([^']+)'.*/\1/p" index.asset.php | head -1)
+          STABLE=$(sed -nE 's/.*Stable tag:[[:space:]]*([0-9][0-9.]+).*/\1/p' readme.txt | head -1)
+          echo "tag=$TAG block=$BLOCK php=$PHP asset=$ASSET stable=$STABLE"
+          fail=0
+          for pair in "block.json:$BLOCK" "plugin header:$PHP" "index.asset.php:$ASSET" "readme Stable tag:$STABLE"; do
+            name="${pair%%:*}"; val="${pair##*:}"
+            if [ "$val" != "$TAG" ]; then
+              echo "::error::$name is '$val' but the tag is '$TAG' — bump it to match before tagging."
+              fail=1
+            fi
+          done
+          [ "$fail" -eq 0 ] || exit 1
+
+      # Zip so the plugin lives at rigpolice-embed/rigpolice-embed.php inside the archive. Exclude VCS,
+      # this workflow, and .wordpress-org (those graphics go to the WP.org SVN assets dir, not the zip).
+      - name: Package plugin zip
+        run: |
+          mkdir -p build/rigpolice-embed
+          rsync -a --exclude='.git' --exclude='.github' --exclude='.wordpress-org' --exclude='build' ./ build/rigpolice-embed/
+          (cd build && zip -qr ../rigpolice-embed.zip rigpolice-embed)
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "RigPolice Embed $GITHUB_REF_NAME" \
+            --generate-notes \
+            rigpolice-embed.zip

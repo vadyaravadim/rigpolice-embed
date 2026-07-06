@@ -61,13 +61,21 @@ Zero-build by design: plain `wp.*` globals in `index.js`, dependencies declared 
 | `render.php` | Server render → the `embed.js` snippet. |
 | `readme.txt` | WordPress.org-style readme. |
 
-### Package a release
+### Releasing
 
-```bash
-zip -r rigpolice-embed.zip rigpolice-embed
-```
+Releases are automated by `.github/workflows/release.yml` (tag-driven). To cut one:
 
-so the plugin lives at `rigpolice-embed/rigpolice-embed.php` inside the archive.
+1. Bump the version in **all four** places — `block.json`, the `Version:` header in `rigpolice-embed.php`,
+   `index.asset.php`, and `readme.txt`'s `Stable tag:` — and add a `readme.txt` changelog entry.
+2. Commit, then push a matching tag:
+
+   ```bash
+   git tag v1.3.0 && git push origin v1.3.0
+   ```
+
+The workflow verifies the four versions equal the tag (fails loud on any mismatch), packages the zip
+(plugin at `rigpolice-embed/rigpolice-embed.php` inside), and publishes a GitHub Release with it. For a
+one-off local test build, `zip -r rigpolice-embed.zip rigpolice-embed` from a clean checkout still works.
 
 ## Links
 
