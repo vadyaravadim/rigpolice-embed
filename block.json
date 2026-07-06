@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "rigpolice/embed",
+	"version": "1.0.0",
+	"title": "RigPolice Tool",
+	"category": "embed",
+	"icon": "screenoptions",
+	"description": "Embed a free RigPolice gear-test tool. The widget loads in its own frame and auto-resizes.",
+	"keywords": [ "rigpolice", "embed", "test", "widget", "gaming" ],
+	"textdomain": "rigpolice-embed",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"attributes": {
+		"tool": { "type": "string", "default": "" },
+		"dofollow": { "type": "boolean", "default": false },
+		"from": { "type": "string", "default": "" },
+		"to": { "type": "string", "default": "" }
+	},
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php"
+}
