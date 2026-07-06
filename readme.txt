@@ -42,6 +42,26 @@ No. Each test runs in the reader's browser inside its own frame, with no account
 
 The block adds a small credit link under the tool, nofollow by default. Switch it to dofollow in the block's Link settings if you want.
 
+== Screenshots ==
+
+1. The "RigPolice Tool" block: pick a tool from the live dropdown and see its default size.
+2. The sensitivity converter with a From and To game pair preset.
+3. An embedded tool on the front end, auto-sized to the content.
+
+== External Services ==
+
+This plugin connects to RigPolice (https://rigpolice.com), the service that hosts the test tools, so the embedded widgets always match the live site.
+
+What it loads, and when:
+
+* On the front end, each block outputs a script tag that loads the shared loader script `https://rigpolice.com/embed.js` in the reader's browser. That loader injects the tool's iframe (served from rigpolice.com) and resizes it to fit. The test itself runs inside that iframe, in the reader's own browser.
+* In the block editor only, the block fetches `https://rigpolice.com/embeds.json` (the list of embeddable tools) and `https://rigpolice.com/games.json` (the sensitivity-converter game list) to fill the tool and game pickers.
+
+This plugin sends no personal data about you or your readers to RigPolice. The editor requests are plain reads of public catalogs; the front-end loader only passes the tool slug you picked in the block. Nothing tracks your readers, and the plugin sets no cookies on your site.
+
+RigPolice privacy policy: https://rigpolice.com/privacy/
+RigPolice site and contact: https://rigpolice.com/about/
+
 == Changelog ==
 
 = 1.0.0 =
