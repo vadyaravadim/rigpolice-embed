@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "rigpolice/embed",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"title": "RigPolice Tool",
 	"category": "embed",
 	"icon": "screenoptions",
@@ -17,7 +17,8 @@
 		"tool": { "type": "string", "default": "" },
 		"dofollow": { "type": "boolean", "default": false },
 		"from": { "type": "string", "default": "" },
-		"to": { "type": "string", "default": "" }
+		"to": { "type": "string", "default": "" },
+		"width": { "type": "number" }
 	},
 	"editorScript": "file:./index.js",
 	"render": "file:./render.php"

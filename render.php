@@ -28,11 +28,17 @@ $pair = ( '' !== $from && '' !== $to && $from !== $to )
 	? sprintf( ' data-from="%s" data-to="%s"', esc_attr( $from ), esc_attr( $to ) )
 	: '';
 
+// Optional max-width override (integer px). embed.js caps the frame's max-width; height stays auto.
+$width = ( isset( $attributes['width'] ) && is_numeric( $attributes['width'] ) )
+	? sprintf( ' data-width="%d"', (int) $attributes['width'] )
+	: '';
+
 printf(
-	'<div %1$s><script async src="%2$s" data-tool="%3$s"%4$s%5$s></script></div>',
+	'<div %1$s><script async src="%2$s" data-tool="%3$s"%4$s%5$s%6$s></script></div>',
 	get_block_wrapper_attributes(), // WP-generated attribute string (class/align), already escaped.
 	esc_url( 'https://rigpolice.com/embed.js' ),
 	esc_attr( $tool ),
 	$pair, // ' data-from="x" data-to="y"' or '' (values escaped above).
+	$width, // ' data-width="480"' or '' (cast to int).
 	$dofollow // Literal ' data-dofollow' or '' (no user input).
 );

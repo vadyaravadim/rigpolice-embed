@@ -4,7 +4,7 @@ Tags: embed, gaming, hardware test, mouse test, widget
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,10 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.1.0 =
+* Add a Max width control in the block sidebar (height still fits the content automatically).
+* Make the credit link under the tool a small, unobtrusive line instead of a large link.
 
 = 1.0.0 =
 * First release: live tool picker, size preview, sensitivity converter game-pair preset, and a nofollow/dofollow credit-link toggle.

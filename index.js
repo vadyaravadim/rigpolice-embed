@@ -44,6 +44,7 @@
 			var dofollow = props.attributes.dofollow;
 			var from = props.attributes.from;
 			var to = props.attributes.to;
+			var width = props.attributes.width;
 			var setAttributes = props.setAttributes;
 
 			var toolsState = useState( null ); // null = loading, array = loaded
@@ -95,10 +96,31 @@
 
 			var blockProps = useBlockProps();
 
-			// Sidebar: the dofollow opt-in (nofollow by default, matching the on-site embed modal).
+			// Sidebar: a Max width control (height is auto — the frame resizes to its content) and the
+			// dofollow opt-in (nofollow by default, matching the on-site embed modal).
 			var inspector = el(
 				InspectorControls,
 				null,
+				el(
+					cmp.PanelBody,
+					{ title: __( 'Size', 'rigpolice-embed' ), initialOpen: true },
+					el( cmp.RangeControl, {
+						label: __( 'Max width (px)', 'rigpolice-embed' ),
+						value: width,
+						onChange: function ( value ) {
+							setAttributes( { width: value } );
+						},
+						min: 280,
+						max: 1200,
+						allowReset: true,
+						help: __(
+							"Leave empty for the tool's default width. The frame is always responsive and its height fits the content automatically.",
+							'rigpolice-embed'
+						),
+						__next40pxDefaultSize: true,
+						__nextHasNoMarginBottom: true,
+					} )
+				),
 				el(
 					cmp.PanelBody,
 					{ title: __( 'Link settings', 'rigpolice-embed' ), initialOpen: false },
