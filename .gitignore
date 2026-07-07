@@ -8,6 +8,9 @@
 # Node tooling, if ever introduced locally (wp-env runs via npx, the plugin has no repo deps)
 node_modules/
 
+# wp-env local override — opt in to a LOCAL rigpolice build (RIGPOLICE_EMBED_DEV_ORIGIN); never committed
+.wp-env.override.json
+
 # OS / editor cruft
 .DS_Store
 Thumbs.db

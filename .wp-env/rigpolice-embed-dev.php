@@ -5,8 +5,9 @@
  * `mappings`) and is excluded from the release zip (.github/workflows/release.yml `--exclude='.wp-env*'`),
  * so production always ships the plugin's real https://rigpolice.com URLs, unmodified.
  *
- * Both redirects key off RIGPOLICE_EMBED_DEV_ORIGIN (set in .wp-env.json `config`); unset it (or drop this
- * file) to test against production instead:
+ * Both redirects key off RIGPOLICE_EMBED_DEV_ORIGIN — UNSET by default, so this no-ops and the block hits
+ * PRODUCTION. To point at a LOCAL build, set it in `.wp-env.override.json` (gitignored, never committed):
+ *   { "config": { "RIGPOLICE_EMBED_DEV_ORIGIN": "http://localhost:8787" } }
  *   1. Front end — rewrite the prod origin in the rigpolice/embed block's rendered <script src>. The
  *      loader is self-locating, so pointing its <script src> at the dev origin loads the iframe + brand
  *      link from the local build too.
