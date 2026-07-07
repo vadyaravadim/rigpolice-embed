@@ -4,7 +4,7 @@ Tags: embed, gaming, hardware test, mouse test, widget
 Requires at least: 6.3
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.3.2
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,7 +18,7 @@ Tools you can embed include the CPS test, mouse test, DPI analyzer, double-click
 
 For the sensitivity converter, you can preset a game pair (for example CS:GO to Valorant) so the embedded widget opens on the conversion your post covers. Readers can still switch games inside the widget.
 
-The block adds a small credit link under each tool. It is nofollow by default; you can switch it to dofollow in the block's Link settings.
+An optional credit link can be shown under the tool. It is off by default; turn it on per embed with the Show credit link toggle in the block sidebar.
 
 The plugin is open source (GPL-2.0-or-later). Source and issues: https://github.com/vadyaravadim/rigpolice-embed
 
@@ -38,9 +38,9 @@ No. Each tool loads in its own frame, and only when the reader scrolls near it, 
 
 No. Each test runs in the reader's browser inside its own frame, with no account and no cookies set on your site.
 
-= Is there a backlink? =
+= Does the block add a link to my site? =
 
-The block adds a small credit link under the tool, nofollow by default. Switch it to dofollow in the block's Link settings if you want.
+Not by default. You can optionally turn on a small credit link under the tool with the Show credit link toggle in the block sidebar; it stays off unless you enable it.
 
 == Screenshots ==
 
@@ -63,6 +63,9 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.0 =
+* The credit link under the tool is now off by default. Turn it on per embed with the new "Show credit link" toggle in the block sidebar.
 
 = 1.3.2 =
 * Housekeeping: direct-access hardening, cleaner output escaping, and WordPress 7.0 compatibility. No change to how the block works.

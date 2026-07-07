@@ -1,7 +1,12 @@
 {
+  "core": "WordPress/WordPress#6.9.4",
   "plugins": ["."],
   "port": 9400,
   "config": {
-    "WP_DEBUG": true
+    "WP_DEBUG": true,
+    "RIGPOLICE_EMBED_DEV_ORIGIN": "http://localhost:8787"
+  },
+  "mappings": {
+    "wp-content/mu-plugins/rigpolice-embed-dev.php": ".wp-env/rigpolice-embed-dev.php"
   }
 }

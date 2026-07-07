@@ -38,10 +38,21 @@
 			.catch( onErr );
 	}
 
+	// Look up a catalog row by slug. Reused by the current-selection read and the picker's onChange,
+	// which bakes the row's anchor into the block (embed.js reads data-anchor with no fallback).
+	function findTool( list, slug ) {
+		for ( var i = 0; i < list.length; i++ ) {
+			if ( list[ i ].slug === slug ) {
+				return list[ i ];
+			}
+		}
+		return null;
+	}
+
 	registerBlockType( 'rigpolice/embed', {
 		edit: function ( props ) {
 			var tool = props.attributes.tool;
-			var dofollow = props.attributes.dofollow;
+			var showcredit = props.attributes.showcredit;
 			var from = props.attributes.from;
 			var to = props.attributes.to;
 			var width = props.attributes.width;
@@ -96,8 +107,7 @@
 
 			var blockProps = useBlockProps();
 
-			// Sidebar: a Max width control (height is auto — the frame resizes to its content) and the
-			// dofollow opt-in (nofollow by default, matching the on-site embed modal).
+			// Sidebar: a Max width control (height is auto — the frame resizes to its content).
 			var inspector = el(
 				InspectorControls,
 				null,
@@ -123,16 +133,16 @@
 				),
 				el(
 					cmp.PanelBody,
-					{ title: __( 'Link settings', 'rigpolice-embed' ), initialOpen: false },
+					{ title: __( 'Credit link', 'rigpolice-embed' ), initialOpen: false },
 					el( cmp.ToggleControl, {
-						label: __( 'Dofollow credit link', 'rigpolice-embed' ),
+						label: __( 'Show credit link to RigPolice', 'rigpolice-embed' ),
 						help: __(
-							'The credit link under the tool is nofollow by default. Turn this on to make it dofollow.',
+							'Off by default. Turn on to add a small dofollow credit link under the tool. The tool always shows RigPolice branding inside its own frame.',
 							'rigpolice-embed'
 						),
-						checked: !! dofollow,
+						checked: !! showcredit,
 						onChange: function ( value ) {
-							setAttributes( { dofollow: value } );
+							setAttributes( { showcredit: value } );
 						},
 						__nextHasNoMarginBottom: true,
 					} )
@@ -160,13 +170,7 @@
 					return { label: t.title + ' (' + t.category + ')', value: t.slug };
 				} );
 
-				var selected = null;
-				for ( var i = 0; i < tools.length; i++ ) {
-					if ( tools[ i ].slug === tool ) {
-						selected = tools[ i ];
-						break;
-					}
-				}
+				var selected = findTool( tools, tool );
 
 				var instructions = selected
 					? __( 'Default size:', 'rigpolice-embed' ) +
@@ -188,9 +192,16 @@
 					value: tool,
 					options: toolOptions,
 					placeholder: __( 'Search tools…', 'rigpolice-embed' ),
-					// Reset the game pair when the tool changes — from/to only apply to the converter.
+					// Bake the picked tool's anchor into the block (embed.js reads data-anchor with no
+					// fallback) and reset the game pair — from/to only apply to the converter.
 					onChange: function ( value ) {
-						setAttributes( { tool: value || '', from: '', to: '' } );
+						var picked = findTool( tools, value );
+						setAttributes( {
+							tool: value || '',
+							anchor: picked ? picked.anchor : '',
+							from: '',
+							to: '',
+						} );
 					},
 					__next40pxDefaultSize: true,
 					__nextHasNoMarginBottom: true,
