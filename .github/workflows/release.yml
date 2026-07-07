@@ -17,7 +17,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The version lives as a literal in exactly two spots: the plugin header (the source WP reads) and
       # readme.txt's Stable tag (a WP.org cross-format mirror that can't read PHP). Both must match the tag
