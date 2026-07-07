@@ -152,7 +152,6 @@
 			var body;
 			if ( toolsFailed ) {
 				body = el( cmp.Placeholder, {
-					icon: 'screenoptions',
 					label: LABEL,
 					instructions: __(
 						'Could not load the tool list from rigpolice.com. Check the connection and reload the editor.',
@@ -162,7 +161,7 @@
 			} else if ( tools === null ) {
 				body = el(
 					cmp.Placeholder,
-					{ icon: 'screenoptions', label: LABEL },
+					{ label: LABEL },
 					el( cmp.Spinner )
 				);
 			} else {
@@ -257,7 +256,7 @@
 
 				body = el(
 					cmp.Placeholder,
-					{ icon: 'screenoptions', label: LABEL, instructions: instructions },
+					{ label: LABEL, instructions: instructions },
 					toolSelect,
 					pairPicker
 				);

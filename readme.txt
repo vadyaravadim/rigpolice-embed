@@ -4,7 +4,7 @@ Tags: embed, gaming, hardware test, mouse test, widget
 Requires at least: 6.3
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,9 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.1 =
+* Fix a small alignment glitch in the block editor: the "RigPolice Tool" block label no longer sits slightly indented.
 
 = 1.4.0 =
 * The credit link under the tool is now off by default. Turn it on per embed with the new "Show credit link" toggle in the block sidebar.
