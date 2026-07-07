@@ -2,9 +2,9 @@
 Contributors: rigpolice
 Tags: embed, gaming, hardware test, mouse test, widget
 Requires at least: 6.3
-Tested up to: 6.7
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,9 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.3.2 =
+* Housekeeping: direct-access hardening, cleaner output escaping, and WordPress 7.0 compatibility. No change to how the block works.
 
 = 1.3.1 =
 * Fix the editor's tool and game pickers: the dropdown no longer covers the search box, and the control no longer changes width or wraps long tool names as you type.

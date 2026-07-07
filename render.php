@@ -13,32 +13,47 @@
  * @package RigPolice\Embed
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // No direct access.
+}
+
 $tool = isset( $attributes['tool'] ) ? trim( (string) $attributes['tool'] ) : '';
 if ( '' === $tool ) {
 	return ''; // No tool picked yet — render nothing on the front end.
 }
 
-$dofollow = ! empty( $attributes['dofollow'] ) ? ' data-dofollow' : '';
+$from  = isset( $attributes['from'] ) ? trim( (string) $attributes['from'] ) : '';
+$to    = isset( $attributes['to'] ) ? trim( (string) $attributes['to'] ) : '';
+$width = ( isset( $attributes['width'] ) && is_numeric( $attributes['width'] ) ) ? (int) $attributes['width'] : 0;
 
-// Converter game pair. Only emitted when both are set and differ (matching embed.js's own guard), so a
-// non-converter tool, whose from/to are always reset to '' in the editor, never carries a stray pair.
-$from = isset( $attributes['from'] ) ? trim( (string) $attributes['from'] ) : '';
-$to   = isset( $attributes['to'] ) ? trim( (string) $attributes['to'] ) : '';
-$pair = ( '' !== $from && '' !== $to && $from !== $to )
-	? sprintf( ' data-from="%s" data-to="%s"', esc_attr( $from ), esc_attr( $to ) )
-	: '';
+// Assemble the loader's data-* attributes. Every value is escaped/cast HERE, so the printf below is safe.
+$attrs = sprintf( ' data-tool="%s"', esc_attr( $tool ) );
+
+// Converter game pair: only when both are set and differ (matching embed.js's own guard), so a
+// non-converter tool (from/to reset to '' in the editor) never carries a stray pair.
+if ( '' !== $from && '' !== $to && $from !== $to ) {
+	$attrs .= sprintf( ' data-from="%s" data-to="%s"', esc_attr( $from ), esc_attr( $to ) );
+}
 
 // Optional max-width override (integer px). embed.js caps the frame's max-width; height stays auto.
-$width = ( isset( $attributes['width'] ) && is_numeric( $attributes['width'] ) )
-	? sprintf( ' data-width="%d"', (int) $attributes['width'] )
-	: '';
+if ( $width > 0 ) {
+	$attrs .= sprintf( ' data-width="%d"', $width );
+}
 
+// dofollow opt-in (nofollow is embed.js's default). Literal, no user input.
+if ( ! empty( $attributes['dofollow'] ) ) {
+	$attrs .= ' data-dofollow';
+}
+
+// Dynamic render on purpose: printing the loader <script> server-side (not from a static save()) is what
+// stops WP's KSES from stripping it. Every interpolated value is escaped/cast above and
+// get_block_wrapper_attributes() returns WP-escaped output; wp_kses() can't be used here because it would
+// strip the required <script> tag.
+// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.EnqueuedResources.NonEnqueuedScript
 printf(
-	'<div %1$s><script async src="%2$s" data-tool="%3$s"%4$s%5$s%6$s></script></div>',
-	get_block_wrapper_attributes(), // WP-generated attribute string (class/align), already escaped.
+	'<div %1$s><script async src="%2$s"%3$s></script></div>',
+	get_block_wrapper_attributes(),
 	esc_url( 'https://rigpolice.com/embed.js' ),
-	esc_attr( $tool ),
-	$pair, // ' data-from="x" data-to="y"' or '' (values escaped above).
-	$width, // ' data-width="480"' or '' (cast to int).
-	$dofollow // Literal ' data-dofollow' or '' (no user input).
+	$attrs
 );
+// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.EnqueuedResources.NonEnqueuedScript

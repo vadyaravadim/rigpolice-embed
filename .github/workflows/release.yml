@@ -39,12 +39,14 @@ jobs:
           done
           [ "$fail" -eq 0 ] || exit 1
 
-      # Zip so the plugin lives at rigpolice-embed/rigpolice-embed.php inside the archive. Exclude VCS,
-      # this workflow, and .wordpress-org (those graphics go to the WP.org SVN assets dir, not the zip).
+      # Zip so the plugin lives at rigpolice-embed/rigpolice-embed.php inside the archive. Ship source only:
+      # exclude EVERY hidden file (.git/.github/.wp-env.json/.gitignore/.wordpress-org) — Plugin Check rejects
+      # hidden files, and the .wordpress-org graphics go to the WP.org SVN assets dir, not the zip — plus the
+      # build/ dir itself.
       - name: Package plugin zip
         run: |
           mkdir -p build/rigpolice-embed
-          rsync -a --exclude='.git' --exclude='.github' --exclude='.wordpress-org' --exclude='build' ./ build/rigpolice-embed/
+          rsync -a --exclude='.*' --exclude='build' ./ build/rigpolice-embed/
           (cd build && zip -qr ../rigpolice-embed.zip rigpolice-embed)
 
       - name: Publish GitHub Release

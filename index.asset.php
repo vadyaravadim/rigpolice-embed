@@ -7,6 +7,10 @@
  * @package RigPolice\Embed
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // No direct access.
+}
+
 // Version is the single-source plugin header, read back here so a release bumps it only there (+ readme
 // Stable tag). block.json omits `version` (no runtime effect); this value drives the editor asset ?ver=.
 $rigpolice_embed_meta = get_file_data( __DIR__ . '/rigpolice-embed.php', array( 'Version' => 'Version' ) );
