@@ -1,0 +1,15 @@
+# This plugin is zero-build — only source is committed. The rest appears from local dev tooling
+# (wp-env, ad-hoc packaging) and must never land in the repo or ship in the release zip.
+
+# Local packaged plugin zips (the real release artifact is built by release.yml)
+/*.zip
+/build/
+
+# Node tooling, if ever introduced locally (wp-env runs via npx, the plugin has no repo deps)
+node_modules/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

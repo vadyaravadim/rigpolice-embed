@@ -57,7 +57,7 @@ Zero-build by design: plain `wp.*` globals in `index.js`, dependencies declared 
 | `rigpolice-embed.php` | Plugin header + `register_block_type()` on `init`. |
 | `block.json` | Block metadata (attributes, editor script, dynamic render). |
 | `index.js` | Editor UI (tool picker, size preview, converter pair picker, dofollow toggle). |
-| `index.asset.php` | Hand-written dependency manifest for `index.js`. |
+| `index.asset.php` | Hand-written dependency manifest for `index.js` (version read from the plugin header). |
 | `render.php` | Server render → the `embed.js` snippet. |
 | `readme.txt` | WordPress.org-style readme. |
 
@@ -65,15 +65,16 @@ Zero-build by design: plain `wp.*` globals in `index.js`, dependencies declared 
 
 Releases are automated by `.github/workflows/release.yml` (tag-driven). To cut one:
 
-1. Bump the version in **all four** places — `block.json`, the `Version:` header in `rigpolice-embed.php`,
-   `index.asset.php`, and `readme.txt`'s `Stable tag:` — and add a `readme.txt` changelog entry.
+1. Bump the version in **two** places — the `Version:` header in `rigpolice-embed.php` and `readme.txt`'s
+   `Stable tag:` — and add a `readme.txt` changelog entry. (`block.json` has no `version`; `index.asset.php`
+   reads it from the header, so both stay in sync automatically.)
 2. Commit, then push a matching tag:
 
    ```bash
    git tag v1.3.0 && git push origin v1.3.0
    ```
 
-The workflow verifies the four versions equal the tag (fails loud on any mismatch), packages the zip
+The workflow verifies those two versions equal the tag (fails loud on any mismatch), packages the zip
 (plugin at `rigpolice-embed/rigpolice-embed.php` inside), and publishes a GitHub Release with it. For a
 one-off local test build, `zip -r rigpolice-embed.zip rigpolice-embed` from a clean checkout still works.
 

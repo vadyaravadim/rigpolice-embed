@@ -3,7 +3,20 @@
  * ComboboxControl renders its suggestions list IN FLOW (right after the input), so opening a picker
  * pushes the rest of the block down and the block visibly "jumps". Float the list over the content
  * instead — absolute-positioned under the input, like a normal dropdown — so opening it reflows nothing.
+ *
+ * `top: 100%` is load-bearing: recent WP wraps the input in a flex row inside
+ * `__suggestions-container`, so the absolutely-positioned list defaults to `top: 0` and would sit ON
+ * TOP of the input (hiding the search box). Anchoring it to the container's bottom drops it below.
  */
+/* The block Placeholder lays its controls in a shrink-to-fit flex ROW, so each ComboboxControl sizes to
+ * its own content: the token input auto-widens as you type, making the control (and its inset-0 list)
+ * JUMP in width, and long tool labels wrap. Stack the controls in a column so each spans the full
+ * fieldset width and stays a stable size regardless of the typed text. */
+.wp-block-rigpolice-embed .components-placeholder__fieldset {
+	flex-direction: column;
+	align-items: stretch;
+}
+
 .wp-block-rigpolice-embed .components-combobox-control__suggestions-container {
 	position: relative;
 }
@@ -11,6 +24,8 @@
 .wp-block-rigpolice-embed .components-form-token-field__suggestions-list {
 	position: absolute;
 	inset-inline: 0;
+	top: 100%;
+	margin-top: 2px;
 	z-index: 1000000;
 	max-height: 15rem;
 	overflow-y: auto;

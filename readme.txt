@@ -4,7 +4,7 @@ Tags: embed, gaming, hardware test, mouse test, widget
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,9 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.3.1 =
+* Fix the editor's tool and game pickers: the dropdown no longer covers the search box, and the control no longer changes width or wraps long tool names as you type.
 
 = 1.3.0 =
 * Fix the editor jumping when a picker opens: the suggestions now float over the block instead of pushing it down.

@@ -1,8 +1,9 @@
 name: Release
 
-# Tag-driven release. Push a `v*` tag and this: (1) verifies all four version declarations equal the tag
-# (drift guard), (2) packages the plugin zip (excluding VCS + WP.org assets), (3) publishes a GitHub
-# Release with it. So a release is just: bump the four versions + changelog, commit, then
+# Tag-driven release. Push a `v*` tag and this: (1) verifies the plugin header + readme Stable tag equal
+# the tag (drift guard; block.json omits `version` and index.asset.php derives it from the header, so they
+# can't drift), (2) packages the plugin zip (excluding VCS + WP.org assets), (3) publishes a GitHub
+# Release with it. So a release is just: bump those two + changelog, commit, then
 # `git tag vX.Y.Z && git push origin vX.Y.Z`.
 on:
   push:
@@ -18,18 +19,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The four places the version lives must all match the tag (minus the leading v). Nothing else
-      # keeps them in sync, so this is the single gate against a skewed release — fail loud, don't ship.
+      # The version lives as a literal in exactly two spots: the plugin header (the source WP reads) and
+      # readme.txt's Stable tag (a WP.org cross-format mirror that can't read PHP). Both must match the tag
+      # (minus the leading v); block.json omits `version` and index.asset.php derives it from the header, so
+      # they can't skew. Fail loud, don't ship a mismatch.
       - name: Verify version consistency
         run: |
           TAG="${GITHUB_REF_NAME#v}"
-          BLOCK=$(sed -nE 's/.*"version":[[:space:]]*"([^"]+)".*/\1/p' block.json | head -1)
           PHP=$(sed -nE 's/.*Version:[[:space:]]*([0-9][0-9.]+).*/\1/p' rigpolice-embed.php | head -1)
-          ASSET=$(sed -nE "s/.*'version'[[:space:]]*=>[[:space:]]*'([^']+)'.*/\1/p" index.asset.php | head -1)
           STABLE=$(sed -nE 's/.*Stable tag:[[:space:]]*([0-9][0-9.]+).*/\1/p' readme.txt | head -1)
-          echo "tag=$TAG block=$BLOCK php=$PHP asset=$ASSET stable=$STABLE"
+          echo "tag=$TAG php=$PHP stable=$STABLE"
           fail=0
-          for pair in "block.json:$BLOCK" "plugin header:$PHP" "index.asset.php:$ASSET" "readme Stable tag:$STABLE"; do
+          for pair in "plugin header:$PHP" "readme Stable tag:$STABLE"; do
             name="${pair%%:*}"; val="${pair##*:}"
             if [ "$val" != "$TAG" ]; then
               echo "::error::$name is '$val' but the tag is '$TAG' — bump it to match before tagging."

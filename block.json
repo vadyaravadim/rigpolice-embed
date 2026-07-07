@@ -2,7 +2,6 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "rigpolice/embed",
-	"version": "1.3.0",
 	"title": "RigPolice Tool",
 	"category": "embed",
 	"icon": "screenoptions",
