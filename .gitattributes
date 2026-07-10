@@ -1,0 +1,20 @@
+# Zero-build plugin: control BOTH the WordPress.org SVN trunk contents and the GitHub-generated zip
+# from one place. The 10up deploy action honors these `export-ignore` rules (no build step), and
+# `git archive` applies them too, so the GitHub Release zip == what ships to WP.org.
+#
+# Everything NOT listed here is plugin source and DOES ship: LICENSE, readme.txt, rigpolice-embed.php,
+# render.php, block.json, index.js, index.asset.php, editor.css.
+#
+# .wordpress-org is export-ignored from trunk on purpose — the action copies it to the SVN `assets/`
+# dir (banners/icons/screenshots), so shipping it in trunk too would duplicate it.
+
+/.git                   export-ignore
+/.github                export-ignore
+/.gitattributes         export-ignore
+/.gitignore             export-ignore
+/.distignore            export-ignore
+/.wordpress-org         export-ignore
+/.wp-env                export-ignore
+/.wp-env.json           export-ignore
+/.wp-env.override.json  export-ignore
+/README.md              export-ignore
