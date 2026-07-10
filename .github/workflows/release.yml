@@ -3,8 +3,10 @@ name: Release
 # Tag-driven release. Push a `v*` tag and this: (1) verifies the plugin header + readme Stable tag equal
 # the tag (drift guard; block.json omits `version` and index.asset.php derives it from the header, so they
 # can't drift), (2) packages the plugin zip (excluding VCS + WP.org assets), (3) publishes a GitHub
-# Release with it. So a release is just: bump those two + changelog, commit, then
-# `git tag vX.Y.Z && git push origin vX.Y.Z`.
+# Release with it, AND (4) deploys to the WordPress.org plugin directory over SVN (trunk + tags/<version>
+# + assets from .wordpress-org). So a release is just: bump those two + changelog, commit, then
+# `git tag vX.Y.Z && git push origin vX.Y.Z`. What ships is scoped by .gitattributes export-ignore
+# (source only — same set for the GitHub zip and the SVN trunk).
 on:
   push:
     tags:
@@ -58,3 +60,29 @@ jobs:
             --title "RigPolice Embed $GITHUB_REF_NAME" \
             --generate-notes \
             rigpolice-embed.zip
+
+  # Publish the same commit to the WordPress.org plugin directory over SVN. Runs in parallel with the
+  # GitHub Release job (independent sinks; no ordering needed). The 10up action checks out SVN, syncs
+  # trunk to this commit (scoped by .gitattributes export-ignore), copies .wordpress-org/* into the SVN
+  # assets/ dir, then commits trunk + a tags/<VERSION> snapshot. VERSION is set explicitly to the tag
+  # minus the leading `v`: our git tags are `v1.4.1` but WP.org's tags/ dir and readme Stable tag are
+  # bare `1.4.1`, and they must match. Requires two repo secrets: SVN_USERNAME + SVN_PASSWORD (the
+  # WordPress.org SVN password, NOT the account password).
+  wordpress-org:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # WP.org's tags/ dir and the readme Stable tag are bare (1.4.1); our git tag carries a leading `v`
+      # (v1.4.1). Strip it here — GitHub Actions expressions can't do substring, so compute in shell.
+      - name: Resolve WP.org version from tag
+        id: ver
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to WordPress.org
+        uses: 10up/action-wordpress-plugin-deploy@2.3.0
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: rigpolice-embed
+          VERSION: ${{ steps.ver.outputs.version }}
