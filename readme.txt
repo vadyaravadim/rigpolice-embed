@@ -44,10 +44,9 @@ Not by default. You can optionally turn on a small credit link under the tool wi
 
 == Screenshots ==
 
-1. The "RigPolice Tool" block: pick a tool from the live dropdown and see its default size.
+1. The "RigPolice Tool" block: pick a tool from the live dropdown.
 2. The sensitivity converter with a From and To game pair preset.
-3. An embedded tool on the front end, auto-sized to the content.
-4. The CPS test running inside a published blog post, right where readers land.
+3. The CPS test running inside a published post, right where readers land.
 
 == External Services ==
 
