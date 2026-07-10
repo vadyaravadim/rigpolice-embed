@@ -1,6 +1,6 @@
 === RigPolice Embed ===
 Contributors: rigpolice
-Tags: embed, gaming, hardware test, mouse test, widget
+Tags: mouse test, keyboard test, cps test, hardware test, embed
 Requires at least: 6.3
 Tested up to: 7.0.1
 Requires PHP: 7.4
@@ -47,6 +47,7 @@ Not by default. You can optionally turn on a small credit link under the tool wi
 1. The "RigPolice Tool" block: pick a tool from the live dropdown and see its default size.
 2. The sensitivity converter with a From and To game pair preset.
 3. An embedded tool on the front end, auto-sized to the content.
+4. The CPS test running inside a published blog post, right where readers land.
 
 == External Services ==
 
