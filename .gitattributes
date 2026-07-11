@@ -18,3 +18,4 @@
 /.wp-env.json           export-ignore
 /.wp-env.override.json  export-ignore
 /README.md              export-ignore
+/CLAUDE.md              export-ignore
