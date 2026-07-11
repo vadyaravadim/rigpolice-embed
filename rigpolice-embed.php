@@ -3,7 +3,7 @@
  * Plugin Name:       RigPolice Embed
  * Plugin URI:        https://rigpolice.com/embed-tools/
  * Description:        Let your readers test their gaming gear inside any post. Pick a free mouse, keyboard, monitor, or click-speed test in the block, publish, and the widget loads in its own frame and auto-resizes.
- * Version:           1.4.6
+ * Version:           1.4.7
  * Requires at least: 6.3
  * Requires PHP:      7.4
  * Author:            RigPolice

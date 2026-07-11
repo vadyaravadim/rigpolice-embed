@@ -6,7 +6,8 @@ name: Release
 # Release with it, AND (4) deploys to the WordPress.org plugin directory over SVN (trunk + tags/<version>
 # + assets from .wordpress-org). So a release is just: bump those two + changelog, commit, then
 # `git tag vX.Y.Z && git push origin vX.Y.Z`. What ships is scoped by .gitattributes export-ignore
-# (source only — same set for the GitHub zip and the SVN trunk).
+# (source only — the GitHub zip is built with `git archive`, the SVN trunk by the 10up action, both of
+# which honor that one list, so the two artifacts are the identical set and can't drift).
 on:
   push:
     tags:
@@ -41,14 +42,14 @@ jobs:
           done
           [ "$fail" -eq 0 ] || exit 1
 
-      # Zip so the plugin lives at rigpolice-embed/rigpolice-embed.php inside the archive. Ship source only:
-      # exclude EVERY hidden file (.git/.github/.wp-env.json/.gitignore/.wordpress-org) — Plugin Check rejects
-      # hidden files, and the .wordpress-org graphics go to the WP.org SVN assets dir, not the zip — plus the
-      # build/ dir itself.
+      # Zip so the plugin lives at rigpolice-embed/rigpolice-embed.php inside the archive. Ship source only,
+      # scoped by the SAME .gitattributes export-ignore list the SVN trunk uses — via `git archive`, so the
+      # GitHub zip and the WP.org trunk are the identical set and can't drift (a plain rsync exclude would
+      # only drop dotfiles, leaking export-ignored source like CLAUDE.md/README.md into the zip).
       - name: Package plugin zip
         run: |
-          mkdir -p build/rigpolice-embed
-          rsync -a --exclude='.*' --exclude='build' ./ build/rigpolice-embed/
+          mkdir -p build
+          git archive --format=tar --prefix=rigpolice-embed/ HEAD | tar -xf - -C build
           (cd build && zip -qr ../rigpolice-embed.zip rigpolice-embed)
 
       - name: Publish GitHub Release

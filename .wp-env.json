@@ -6,6 +6,6 @@
     "WP_DEBUG": true
   },
   "mappings": {
-    "wp-content/mu-plugins/rigpolice-embed-dev.php": ".wp-env/rigpolice-embed-dev.php"
+    "wp-content/mu-plugins": ".wp-env"
   }
 }

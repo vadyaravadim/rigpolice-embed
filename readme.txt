@@ -4,7 +4,7 @@ Tags: gaming, speed test, calculator, interactive, diagnostics
 Requires at least: 6.3
 Tested up to: 7.0.1
 Requires PHP: 7.4
-Stable tag: 1.4.6
+Stable tag: 1.4.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,11 +22,39 @@ An optional credit link can be shown under the tool. It is off by default; turn 
 
 The plugin is open source (GPL-2.0-or-later). Source and issues: https://github.com/vadyaravadim/rigpolice-embed
 
+= A note from the developer =
+
+Hi, I'm the developer behind RigPolice. I built these gear tests because I kept wanting a quick, honest way to check a mouse, keyboard, or monitor without installing anything or handing over an email, and I figured other people did too. They're free, they run entirely in your reader's browser, and this block just lets you drop them where they're actually useful, inside your own posts. That's the whole idea: no accounts, no tracking, no upsell.
+
+If it helps you or your readers, I'd genuinely love to hear about it, and an honest review on this page means a lot to a small project like this.
+
+Support, bugs, and ideas are all welcome:
+
+* GitHub issues (fastest): https://github.com/vadyaravadim/rigpolice-embed/issues
+* The plugin's support forum here on WordPress.org
+* RigPolice site and contact: https://rigpolice.com/about/
+
+Thanks for giving it a try. — RigPolice
+
 == Installation ==
 
-1. Install the ZIP via Plugins > Add New > Upload Plugin, or upload the `rigpolice-embed` folder to `/wp-content/plugins/`.
+= Install from your WordPress dashboard (recommended) =
+
+1. Go to Plugins > Add New and search for "RigPolice Embed".
+2. Click Install Now, then Activate.
+
+= Install manually =
+
+1. Download the plugin ZIP, then go to Plugins > Add New > Upload Plugin and upload it (or unzip and copy the `rigpolice-embed` folder into `/wp-content/plugins/` via FTP).
 2. Activate the plugin through the Plugins screen.
-3. Edit a post or page, add the "RigPolice Tool" block, and choose a tool.
+
+= Add a tool to a post =
+
+1. Edit any post or page in the block editor and add the "RigPolice Tool" block.
+2. Pick a tool from the dropdown (the list is pulled live from RigPolice). For the sensitivity converter you can also preset a From/To game pair.
+3. Publish. The widget loads in its own frame and auto-resizes to fit, with no configuration, no accounts, and nothing to set up on the RigPolice side.
+
+The block requires the WordPress block editor (Gutenberg). On sites running the Classic Editor, switch the post to the block editor to add it.
 
 == Frequently Asked Questions ==
 
@@ -63,6 +91,11 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.7 =
+* Fixed two ways the editor could mislead you about which tool is embedded: if the tool list fails to load you now get the error notice instead of an empty picker, and a tool that was renamed or removed on RigPolice now shows a warning instead of leaving the picker blank.
+* Rewrote the Installation tab: install from the WordPress dashboard is now the primary path, manual ZIP/FTP is a fallback, and the steps run through to a published, working tool. No change to how the block works.
+* Added a short note from the developer with support and contact links (GitHub issues, support forum, RigPolice site). No change to how the block works.
 
 = 1.4.6 =
 * Fixed the Live Preview demo post so the CPS test actually shows: the blueprint now creates the post with a real id and loads WordPress by an absolute path. Verified end to end in a local Playground run. No change to how the block works.
