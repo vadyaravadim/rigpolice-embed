@@ -1,0 +1,23 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"meta": {
+		"title": "RigPolice Embed live demo",
+		"author": "rigpolice",
+		"description": "A published post with the RigPolice Tool block rendering a live CPS test. The widget loads from rigpolice.com in its own frame and auto-resizes."
+	},
+	"landingPage": "/?p=4",
+	"preferredVersions": {
+		"php": "8.0",
+		"wp": "latest"
+	},
+	"features": {
+		"networking": true
+	},
+	"login": true,
+	"steps": [
+		{
+			"step": "runPHP",
+			"code": "<?php require_once 'wordpress/wp-load.php'; wp_insert_post( array( 'ID' => 4, 'post_title' => 'RigPolice CPS Test', 'post_status' => 'publish', 'post_type' => 'post', 'post_content' => '<!-- wp:paragraph --><p>Below is a live RigPolice CPS test, embedded with the RigPolice Tool block. It loads in its own frame from rigpolice.com and resizes to fit. Click inside it to start counting your clicks per second.</p><!-- /wp:paragraph --><!-- wp:rigpolice/embed {\"tool\":\"cps-test\",\"anchor\":\"CPS checker by RigPolice\"} /-->' ) );"
+		}
+	]
+}

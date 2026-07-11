@@ -65,6 +65,7 @@ RigPolice site and contact: https://rigpolice.com/about/
 == Changelog ==
 
 = 1.4.4 =
+* Added a WordPress Playground blueprint so the plugin's Live Preview opens a published post with a working CPS test. No change to how the block works.
 * Swapped the hardware-test tag for tags that the directory actually shows and browses. No change to how the block works.
 
 = 1.4.3 =
