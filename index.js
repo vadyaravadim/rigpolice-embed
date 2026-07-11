@@ -33,7 +33,13 @@
 				return r.json();
 			} )
 			.then( function ( data ) {
-				onOk( Array.isArray( data ) ? data : [] );
+				// A 2xx with a non-array body (error envelope, {}, soft-404 HTML that parsed) is a
+				// failure, not an empty catalog — route it to onErr so the editor shows the error state
+				// instead of a working-but-empty picker (the three-state cell can't tell them apart).
+				if ( ! Array.isArray( data ) ) {
+					throw new Error( 'Unexpected payload' );
+				}
+				onOk( data );
 			} )
 			.catch( onErr );
 	}
@@ -155,18 +161,38 @@
 
 				var selected = findTool( tools, tool );
 
-				var instructions = selected
-					? __( 'Default size:', 'rigpolice-embed' ) +
-					  ' ' +
-					  selected.width +
-					  ' x ' +
-					  selected.height +
-					  ' px. ' +
-					  __( 'The frame auto-resizes to fit your page.', 'rigpolice-embed' )
-					: __(
-							'Pick a tool to embed. It loads in its own frame and resizes to fit.',
-							'rigpolice-embed'
-					  );
+				// A saved slug missing from the fresh catalog (tool renamed/removed on the site) would
+				// otherwise render the picker blank — the author sees no selection while render.php still
+				// embeds the stale data-tool. Keep the saved value visible with a synthetic option and warn.
+				var orphaned = tool && ! selected;
+				if ( orphaned ) {
+					toolOptions = toolOptions.concat( {
+						label: tool + ' ' + __( '(no longer in the catalog)', 'rigpolice-embed' ),
+						value: tool,
+					} );
+				}
+
+				var instructions;
+				if ( selected ) {
+					instructions =
+						__( 'Default size:', 'rigpolice-embed' ) +
+						' ' +
+						selected.width +
+						' x ' +
+						selected.height +
+						' px. ' +
+						__( 'The frame auto-resizes to fit your page.', 'rigpolice-embed' );
+				} else if ( orphaned ) {
+					instructions = __(
+						'The saved tool is no longer in the RigPolice catalog. It still embeds on the page — pick a replacement, or reset to remove it.',
+						'rigpolice-embed'
+					);
+				} else {
+					instructions = __(
+						'Pick a tool to embed. It loads in its own frame and resizes to fit.',
+						'rigpolice-embed'
+					);
+				}
 
 				// ComboboxControl (not SelectControl): a searchable input — the tool list is long, so
 				// filter-as-you-type beats scrolling. Built-in label filtering; reset clears to null.
