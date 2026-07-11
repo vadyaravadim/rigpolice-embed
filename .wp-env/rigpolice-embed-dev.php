@@ -1,9 +1,11 @@
 <?php
 /**
  * DEV-ONLY helper (wp-env). Repoints the RigPolice embed block at a LOCAL build for testing WITHOUT
- * touching the shipped plugin. It is mounted into wp-content/mu-plugins/ ONLY by wp-env (.wp-env.json
- * `mappings`) and is excluded from the release zip (.github/workflows/release.yml `--exclude='.wp-env*'`),
- * so production always ships the plugin's real https://rigpolice.com URLs, unmodified.
+ * touching the shipped plugin. wp-env maps the whole `.wp-env` dir onto wp-content/mu-plugins (.wp-env.json
+ * `mappings`) — a DIR map, not a single-file one, because Docker Desktop on macOS fails to bind-mount an
+ * individual file into mu-plugins. It never ships: `/.wp-env` is export-ignored in .gitattributes, so both
+ * the `git archive` GitHub zip and the WP.org SVN trunk drop it. Production always ships the plugin's real
+ * https://rigpolice.com URLs, unmodified.
  *
  * Both redirects key off RIGPOLICE_EMBED_DEV_ORIGIN — UNSET by default, so this no-ops and the block hits
  * PRODUCTION. To point at a LOCAL build, set it in `.wp-env.override.json` (gitignored, never committed):
