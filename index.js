@@ -209,30 +209,28 @@
 							return { label: g.name, value: g.slug };
 						} );
 						// Searchable pair pickers; the reset (X) clears back to "any game, no preset".
+						// One prop bag, two ends — save() keys differ (from/to), so onChange is passed in.
+						function gamePicker( label, value, save ) {
+							return el( cmp.ComboboxControl, {
+								label: label,
+								value: value,
+								options: gameOptions,
+								placeholder: __( 'Any game (no preset)', 'rigpolice-embed' ),
+								onChange: function ( v ) {
+									save( v || '' );
+								},
+								__next40pxDefaultSize: true,
+								__nextHasNoMarginBottom: true,
+							} );
+						}
 						pairPicker = el(
 							Fragment,
 							null,
-							el( cmp.ComboboxControl, {
-								label: __( 'From game', 'rigpolice-embed' ),
-								value: from,
-								options: gameOptions,
-								placeholder: __( 'Any game (no preset)', 'rigpolice-embed' ),
-								onChange: function ( value ) {
-									setAttributes( { from: value || '' } );
-								},
-								__next40pxDefaultSize: true,
-								__nextHasNoMarginBottom: true,
+							gamePicker( __( 'From game', 'rigpolice-embed' ), from, function ( v ) {
+								setAttributes( { from: v } );
 							} ),
-							el( cmp.ComboboxControl, {
-								label: __( 'To game', 'rigpolice-embed' ),
-								value: to,
-								options: gameOptions,
-								placeholder: __( 'Any game (no preset)', 'rigpolice-embed' ),
-								onChange: function ( value ) {
-									setAttributes( { to: value || '' } );
-								},
-								__next40pxDefaultSize: true,
-								__nextHasNoMarginBottom: true,
+							gamePicker( __( 'To game', 'rigpolice-embed' ), to, function ( v ) {
+								setAttributes( { to: v } );
 							} )
 						);
 					}
