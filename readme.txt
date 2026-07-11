@@ -22,6 +22,20 @@ An optional credit link can be shown under the tool. It is off by default; turn 
 
 The plugin is open source (GPL-2.0-or-later). Source and issues: https://github.com/vadyaravadim/rigpolice-embed
 
+= A note from the developer =
+
+Hi, I'm the developer behind RigPolice. I built these gear tests because I kept wanting a quick, honest way to check a mouse, keyboard, or monitor without installing anything or handing over an email, and I figured other people did too. They're free, they run entirely in your reader's browser, and this block just lets you drop them where they're actually useful, inside your own posts. That's the whole idea: no accounts, no tracking, no upsell.
+
+If it helps you or your readers, I'd genuinely love to hear about it, and an honest review on this page means a lot to a small project like this.
+
+Support, bugs, and ideas are all welcome:
+
+* GitHub issues (fastest): https://github.com/vadyaravadim/rigpolice-embed/issues
+* The plugin's support forum here on WordPress.org
+* RigPolice site and contact: https://rigpolice.com/about/
+
+Thanks for giving it a try. — RigPolice
+
 == Installation ==
 
 = Install from your WordPress dashboard (recommended) =
@@ -80,6 +94,7 @@ RigPolice site and contact: https://rigpolice.com/about/
 
 = 1.4.7 =
 * Rewrote the Installation tab: install from the WordPress dashboard is now the primary path, manual ZIP/FTP is a fallback, and the steps run through to a published, working tool. No change to how the block works.
+* Added a short note from the developer with support and contact links (GitHub issues, support forum, RigPolice site). No change to how the block works.
 
 = 1.4.6 =
 * Fixed the Live Preview demo post so the CPS test actually shows: the blueprint now creates the post with a real id and loads WordPress by an absolute path. Verified end to end in a local Playground run. No change to how the block works.
