@@ -1,10 +1,10 @@
 === RigPolice Embed ===
 Contributors: rigpolice
-Tags: speed test, hardware test, gaming, calculator, interactive
+Tags: gaming, speed test, calculator, interactive, diagnostics
 Requires at least: 6.3
 Tested up to: 7.0.1
 Requires PHP: 7.4
-Stable tag: 1.4.3
+Stable tag: 1.4.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,10 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.4 =
+* Added a WordPress Playground blueprint so the plugin's Live Preview opens a published post with a working CPS test. No change to how the block works.
+* Swapped the hardware-test tag for tags that the directory actually shows and browses. No change to how the block works.
 
 = 1.4.3 =
 * Retargeted the directory search tags so the plugin surfaces under the terms people actually browse. No change to how the block works.
