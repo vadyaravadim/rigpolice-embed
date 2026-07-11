@@ -30,6 +30,12 @@ then tag `vX.Y.Z` and push the tag. Prod deploy is driven by the **tag** (`relea
   deploy via `10up/action-wordpress-plugin-deploy` (syncs trunk scoped by `.gitattributes export-ignore`,
   copies `.wordpress-org/*` into SVN `assets/`, tags `tags/<version>`). Requires repo secrets
   `SVN_USERNAME` + `SVN_PASSWORD` (the WordPress.org SVN password, not the account password).
+- **The GitHub zip is packaged with `git archive`, NOT `rsync` — keep it that way.** `.gitattributes`
+  `export-ignore` is the ONE list scoping what ships, and only `git archive` (the zip) and the 10up action
+  (the SVN trunk) honor it, which is what makes the two artifacts the identical set. An `rsync -a
+  --exclude='.*'` only drops DOTfiles, so it silently ships export-ignored non-dotfiles (`CLAUDE.md`,
+  `README.md`) in the GitHub zip while WP.org drops them — the artifacts drift and the invariant the
+  comments promise quietly becomes false.
 
 ## Live Preview (WordPress.org Playground demo)
 
@@ -86,6 +92,25 @@ npx --yes @wp-playground/cli@<ver> run-blueprint \
   `substr_count('<p>')` false-alarms 0 because WP renders `<p class="wp-block-paragraph">`.
 - Get a RED local repro first (e.g. `INSERT_RESULT=0`, `POST_4_EXISTS=no`), apply the fix, get GREEN
   locally, THEN release.
+
+## Local dev stand (wp-env) — for e2e testing the block
+
+`npx @wordpress/env start` boots WP on `localhost:9400` (admin/password) with the plugin mounted live from
+the working tree, so editor edits show up on reload with no build step. Drive the real editor with
+`wp.data` (`insertBlock` / `updateBlockAttributes`) rather than clicking the inserter, and create
+front-end fixtures with `wp post create --post_content='<!-- wp:rigpolice/embed {...} /-->'` — far faster
+and more precise than driving the UI for every permutation. Both catalogs are CORS-open, so the editor's
+pickers work against PROD `rigpolice.com` out of the box; the dev mu-plugin no-ops unless
+`RIGPOLICE_EMBED_DEV_ORIGIN` is set.
+
+- **`mappings` maps the `.wp-env` DIR onto `mu-plugins`, not the single file — do NOT "tidy" it back to a
+  file map.** Docker Desktop on macOS (virtiofs) fails to bind-mount an INDIVIDUAL file into a container
+  path that doesn't exist yet, and `wp-env start` dies with
+  `mountpoint ... is outside of rootfs`. A directory map mounts reliably; `.wp-env/` holds only the dev
+  mu-plugin, so nothing extra leaks into `mu-plugins/`.
+- Assert `render.php`'s real output server-side (`wp eval 'echo do_blocks(get_post(N)->post_content);'`)
+  instead of eyeballing the page — it shows the exact `data-*` set, and `wp_get_script_tag()` escapes every
+  attribute (`esc_attr`), so injected quotes in `tool`/`anchor`/`from` cannot break out.
 
 ## Tools that are intentionally NOT embeddable
 
