@@ -1,14 +1,14 @@
 === RigPolice Embed ===
 Contributors: rigpolice
-Tags: mouse test, keyboard test, cps test, hardware test, embed
+Tags: speed test, hardware test, gaming, calculator, interactive
 Requires at least: 6.3
 Tested up to: 7.0.1
 Requires PHP: 7.4
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Embed free RigPolice gear-test tools with a block: mouse, monitor, keyboard, click, and network testers.
+Add free hands-on gear tests to any post. Readers check their mouse, keyboard, monitor, and click speed right where they read, no sign-up.
 
 == Description ==
 
@@ -63,6 +63,9 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.3 =
+* Retargeted the directory search tags so the plugin surfaces under the terms people actually browse. No change to how the block works.
 
 = 1.4.2 =
 * Refreshed the directory screenshots (now a single walkthrough post, front end included) and retargeted the search tags. No change to how the block works.
