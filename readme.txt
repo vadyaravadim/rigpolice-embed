@@ -4,7 +4,7 @@ Tags: gaming, speed test, calculator, interactive, diagnostics
 Requires at least: 6.3
 Tested up to: 7.0.1
 Requires PHP: 7.4
-Stable tag: 1.4.4
+Stable tag: 1.4.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,9 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.5 =
+* Fixed the Live Preview demo: the blueprint now installs the plugin before creating the demo post, so the CPS test renders instead of erroring. No change to how the block works.
 
 = 1.4.4 =
 * Added a WordPress Playground blueprint so the plugin's Live Preview opens a published post with a working CPS test. No change to how the block works.
