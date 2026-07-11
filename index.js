@@ -40,13 +40,11 @@
 
 	// Look up a catalog row by slug. Reused by the current-selection read and the picker's onChange,
 	// which bakes the row's anchor into the block (embed.js reads data-anchor with no fallback).
+	// Returns undefined on no-match; both call sites already treat the result as truthy/falsy.
 	function findTool( list, slug ) {
-		for ( var i = 0; i < list.length; i++ ) {
-			if ( list[ i ].slug === slug ) {
-				return list[ i ];
-			}
-		}
-		return null;
+		return list.find( function ( t ) {
+			return t.slug === slug;
+		} );
 	}
 
 	registerBlockType( 'rigpolice/embed', {
@@ -58,48 +56,34 @@
 			var width = props.attributes.width;
 			var setAttributes = props.setAttributes;
 
-			var toolsState = useState( null ); // null = loading, array = loaded
+			// Each catalog is one three-state cell: null = loading, false = failed, array = loaded.
+			var toolsState = useState( null );
 			var tools = toolsState[ 0 ];
 			var setTools = toolsState[ 1 ];
-			var toolsErrState = useState( false );
-			var toolsFailed = toolsErrState[ 0 ];
-			var setToolsFailed = toolsErrState[ 1 ];
 
 			var gamesState = useState( null );
 			var games = gamesState[ 0 ];
 			var setGames = gamesState[ 1 ];
-			var gamesErrState = useState( false );
-			var gamesFailed = gamesErrState[ 0 ];
-			var setGamesFailed = gamesErrState[ 1 ];
 
 			useEffect( function () {
 				var alive = true;
-				fetchJson(
-					EMBEDS_URL,
-					function ( d ) {
-						if ( alive ) {
-							setTools( d );
+				function load( url, set ) {
+					fetchJson(
+						url,
+						function ( d ) {
+							if ( alive ) {
+								set( d );
+							}
+						},
+						function () {
+							if ( alive ) {
+								set( false );
+							}
 						}
-					},
-					function () {
-						if ( alive ) {
-							setToolsFailed( true );
-						}
-					}
-				);
-				fetchJson(
-					GAMES_URL,
-					function ( d ) {
-						if ( alive ) {
-							setGames( d );
-						}
-					},
-					function () {
-						if ( alive ) {
-							setGamesFailed( true );
-						}
-					}
-				);
+					);
+				}
+				load( EMBEDS_URL, setTools );
+				load( GAMES_URL, setGames );
 				return function () {
 					alive = false;
 				};
@@ -150,7 +134,7 @@
 			);
 
 			var body;
-			if ( toolsFailed ) {
+			if ( tools === false ) {
 				body = el( cmp.Placeholder, {
 					label: LABEL,
 					instructions: __(
@@ -209,7 +193,7 @@
 				// The converter (preset === 'pair') gets a From/To game picker, populated from games.json.
 				var pairPicker = null;
 				if ( selected && selected.preset === 'pair' ) {
-					if ( gamesFailed ) {
+					if ( games === false ) {
 						pairPicker = el(
 							'p',
 							{ style: { marginTop: '12px' } },
