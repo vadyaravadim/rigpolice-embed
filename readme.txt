@@ -93,6 +93,7 @@ RigPolice site and contact: https://rigpolice.com/about/
 == Changelog ==
 
 = 1.4.7 =
+* Fixed two ways the editor could mislead you about which tool is embedded: if the tool list fails to load you now get the error notice instead of an empty picker, and a tool that was renamed or removed on RigPolice now shows a warning instead of leaving the picker blank.
 * Rewrote the Installation tab: install from the WordPress dashboard is now the primary path, manual ZIP/FTP is a fallback, and the steps run through to a published, working tool. No change to how the block works.
 * Added a short note from the developer with support and contact links (GitHub issues, support forum, RigPolice site). No change to how the block works.
 
