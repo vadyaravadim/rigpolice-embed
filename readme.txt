@@ -4,7 +4,7 @@ Tags: gaming, speed test, calculator, interactive, diagnostics
 Requires at least: 6.3
 Tested up to: 7.0.1
 Requires PHP: 7.4
-Stable tag: 1.4.6
+Stable tag: 1.4.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,9 +24,23 @@ The plugin is open source (GPL-2.0-or-later). Source and issues: https://github.
 
 == Installation ==
 
-1. Install the ZIP via Plugins > Add New > Upload Plugin, or upload the `rigpolice-embed` folder to `/wp-content/plugins/`.
+= Install from your WordPress dashboard (recommended) =
+
+1. Go to Plugins > Add New and search for "RigPolice Embed".
+2. Click Install Now, then Activate.
+
+= Install manually =
+
+1. Download the plugin ZIP, then go to Plugins > Add New > Upload Plugin and upload it (or unzip and copy the `rigpolice-embed` folder into `/wp-content/plugins/` via FTP).
 2. Activate the plugin through the Plugins screen.
-3. Edit a post or page, add the "RigPolice Tool" block, and choose a tool.
+
+= Add a tool to a post =
+
+1. Edit any post or page in the block editor and add the "RigPolice Tool" block.
+2. Pick a tool from the dropdown (the list is pulled live from RigPolice). For the sensitivity converter you can also preset a From/To game pair.
+3. Publish. The widget loads in its own frame and auto-resizes to fit, with no configuration, no accounts, and nothing to set up on the RigPolice side.
+
+The block requires the WordPress block editor (Gutenberg). On sites running the Classic Editor, switch the post to the block editor to add it.
 
 == Frequently Asked Questions ==
 
@@ -63,6 +77,9 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.7 =
+* Rewrote the Installation tab: install from the WordPress dashboard is now the primary path, manual ZIP/FTP is a fallback, and the steps run through to a published, working tool. No change to how the block works.
 
 = 1.4.6 =
 * Fixed the Live Preview demo post so the CPS test actually shows: the blueprint now creates the post with a real id and loads WordPress by an absolute path. Verified end to end in a local Playground run. No change to how the block works.
