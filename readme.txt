@@ -2,9 +2,9 @@
 Contributors: rigpolice
 Tags: gaming, speed test, calculator, interactive, diagnostics
 Requires at least: 6.3
-Tested up to: 7.0.1
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.4.7
+Stable tag: 1.4.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,6 +15,8 @@ Add free hands-on gear tests to any post. Readers check their mouse, keyboard, m
 Add free, no-signup RigPolice test tools to any post or page. Pick a tool in the "RigPolice Tool" block, publish, and the widget loads in its own frame and auto-resizes to fit your layout. No account, and nothing tracks your readers.
 
 Tools you can embed include the CPS test, mouse test, DPI analyzer, double-click test, polling-rate test, keyboard tester, monitor test, refresh-rate test, dead-pixel test, tone generator, internet speed test, sensitivity converter, and more. The list is pulled live from RigPolice, so new tools show up in the block automatically.
+
+Browse every embeddable tool, grouped by section and with a live demo of each: https://rigpolice.com/embed-tools/
 
 For the sensitivity converter, you can preset a game pair (for example CS:GO to Valorant) so the embedded widget opens on the conversion your post covers. Readers can still switch games inside the widget.
 
@@ -91,6 +93,13 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.8 =
+* Fixed the pickers ignoring the arrow keys: Up and Down now walk the suggestion list instead of throwing focus out of the field. Each picker is now a button showing what you picked, and it opens its searchable list in a panel of its own.
+* Added a section filter to the tool picker: click mouse, keyboard, monitor, and so on to narrow the list to that section, and click it again to see everything. The sections come from RigPolice, so a new one appears on its own.
+* Made the tool picker easier to scan: each entry now reads "Tool name • section", so the tools group visibly by section the way they do on the RigPolice embed page.
+* The tool is now marked required, and so are both games on the sensitivity converter: the block tells you what is still missing instead of quietly publishing nothing, or a converter with no preset pair. The game you pick on one side is no longer offered on the other.
+* Added a link under the picker to the RigPolice embed page, where every tool is listed by section with a live demo, so you can see what a tool does before picking it.
 
 = 1.4.7 =
 * Fixed two ways the editor could mislead you about which tool is embedded: if the tool list fails to load you now get the error notice instead of an empty picker, and a tool that was renamed or removed on RigPolice now shows a warning instead of leaving the picker blank.

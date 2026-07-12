@@ -1,0 +1,93 @@
+name: CI
+
+# Two gates, both callable from release.yml so a tag can't deploy code that never passed them:
+#
+#   plugin-check    — WordPress.org compliance (escaping, readme, i18n, guidelines). Catches the class of
+#                     mistake that gets a release REJECTED by WP.org.
+#   render-contract — the front-end output contract of render.php, asserted against a real WordPress.
+#                     save() returns null, so render.php IS what readers get: a regression here ships.
+#                     This is the regression net — plugin-check cannot see it.
+#
+# Zero-build stays intact: no package.json, no composer.json. wp-env runs via npx (as it does locally) and
+# the plugin-check action brings its own WordPress.
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'release/**'
+  workflow_call:
+    inputs:
+      strict-readme:
+        description: >-
+          Enforce the readme's "Tested up to" against the CURRENT WordPress version. release.yml passes true:
+          a stale header must block the RELEASE, which is where the reminder belongs. Branch runs leave it
+          false and mute the check — it compares against whatever WP is current AT RUN TIME, so it turns
+          every open branch red the day WordPress ships a new version, with nobody having changed any code.
+        type: boolean
+        default: false
+
+jobs:
+  plugin-check:
+    name: Plugin Check (WordPress.org compliance)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Check what actually SHIPS, not the working tree. The ship-set is scoped by ONE list —
+      # .gitattributes export-ignore — and `git archive` is what honors it (same command release.yml packages
+      # the zip with). Pointing the checker at the working tree instead would make it see CLAUDE.md, .github,
+      # .wp-env — files that never ship — and force a SECOND exclude list here that could drift from the
+      # first. Same input, one source of truth.
+      - name: Extract the shipped file set
+        run: |
+          mkdir -p build
+          git archive --format=tar --prefix=rigpolice-embed/ HEAD | tar -xf - -C build
+
+      # The guard is NEGATED so the value `&&` carries is the non-empty code, never ''. GitHub Actions
+      # expressions treat '' as FALSY, so the natural-reading `strict && '' || 'code'` would fall THROUGH to
+      # 'code' and mute the check at the one gate meant to enforce it. Written this way, strict mode lands on
+      # the `||` branch and yields '' safely.
+      # On push/pull_request the `inputs` context does not exist at all (a workflow_call `default:` is applied
+      # by the CALLER, not by this file), so `inputs.strict-readme` dereferences to '' -> falsy -> negated to
+      # true -> the code is passed and the check is muted. Which is exactly what branch runs want.
+      - uses: wordpress/plugin-check-action@v1.1.7
+        with:
+          build-dir: ./build/rigpolice-embed
+          ignore-codes: ${{ !inputs.strict-readme && 'outdated_tested_upto_header' || '' }}
+
+  render-contract:
+    name: Render contract (front-end output)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # The same stand used locally (.wp-env.json mounts the working tree as the plugin), so a failure here
+      # reproduces with one command on a laptop: `npx @wordpress/env start`.
+      - name: Start WordPress
+        run: npx --yes @wordpress/env start
+
+      # eval-file, not a shell of assertions: the test drives the REAL render.php through do_blocks() in a
+      # real WordPress. Exit code 1 on any failed assertion fails the job.
+      - name: Assert the block's rendered output
+        run: npx --yes @wordpress/env run cli wp eval-file wp-content/plugins/rigpolice-embed/.github/render-contract.php
+
+  # A SIGNAL, not a gate (continue-on-error): the editor fills its pickers from these two live catalogs, so a
+  # dead or malformed one breaks the editor with no plugin change — worth knowing, but it is not the PR's
+  # fault and must never block a merge on a network hiccup.
+  catalog-alive:
+    name: Catalogs reachable (signal only)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Fetch the tool + game catalogs
+        run: |
+          fail=0
+          for url in https://rigpolice.com/embeds.json https://rigpolice.com/games.json; do
+            body=$(curl -fsS --max-time 20 "$url") || { echo "::warning::$url is unreachable"; fail=1; continue; }
+            # index.js treats a 2xx non-array body as a failure (error envelope, soft-404 HTML that parsed),
+            # not as an empty catalog — mirror that here so this signal means what the editor means.
+            echo "$body" | grep -q '^\s*\[' || { echo "::warning::$url did not return a JSON array"; fail=1; continue; }
+            echo "$url: ok"
+          done
+          exit "$fail"
