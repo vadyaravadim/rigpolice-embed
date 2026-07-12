@@ -17,6 +17,27 @@
 	align-items: stretch;
 }
 
+/* The field's caption row: "Tool" left, sections right. `wrap` so the chips drop to their own line
+ * rather than squeezing the label when the block is narrow. */
+.wp-block-rigpolice-embed .rigpolice-embed__caption {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	column-gap: 12px;
+	row-gap: 4px;
+}
+
+/* Matches core's `.components-base-control__label` — this row replaces it visually, while the control
+ * keeps its own label for the accessible name, hidden from view (see index.js). */
+.wp-block-rigpolice-embed .rigpolice-embed__caption-label {
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1.4;
+	text-transform: uppercase;
+	color: #1e1e1e;
+}
+
 /* The fieldset is a column flex container with its own gap, so spacing is its job — a margin here would
  * stack on top of that gap. `row-gap` only shows up once the chips wrap onto a second line. */
 .wp-block-rigpolice-embed .rigpolice-embed__sections {

@@ -252,38 +252,49 @@
 					);
 				}
 
-				// Section filter, ABOVE the input: the open suggestions list is absolutely positioned over
-				// whatever follows the field (see editor.css), so anything below it is hidden exactly when
-				// the author is choosing. Clicking the active section again clears the filter.
+				// The field's caption row: "Tool" on the left, the section filter on the right. The chips
+				// are NOT passed as the control's `label` — that renders inside BaseControl's <label for>,
+				// where a click on a chip would also be routed to the input and a screen reader would read
+				// every section name as part of the field's name. So the row is drawn here and the control
+				// keeps its own (visually hidden) label for its accessible name.
+				//
+				// ABOVE the input, like the tools-page link: the open suggestions list is absolutely
+				// positioned over whatever follows the field (see editor.css), so anything below it is
+				// hidden exactly when the author is choosing. Clicking the active section clears it.
 				//
 				// aria-current, not aria-pressed: the active section is the current view, not a pushed
 				// toggle. Button turns aria-pressed into its own `is-pressed` class and core paints that
 				// with a solid dark fill, which on a link-variant button renders the label as a black box.
 				var sectionFilter = el(
 					'div',
-					{ className: 'rigpolice-embed__sections' },
-					categoriesOf( tools ).map( function ( name ) {
-						var active = category === name;
-						return el(
-							'span',
-							{ key: name, className: 'rigpolice-embed__section-item' },
-							el(
-								cmp.Button,
-								{
-									variant: 'link',
-									className:
-										'rigpolice-embed__section' +
-										( active ? ' is-active' : '' ),
-									'aria-current': active || undefined,
-									onClick: function () {
-										setCategory( active ? '' : name );
-										focusPicker();
+					{ className: 'rigpolice-embed__caption' },
+					el( 'span', { className: 'rigpolice-embed__caption-label' }, __( 'Tool', 'rigpolice-embed' ) ),
+					el(
+						'div',
+						{ className: 'rigpolice-embed__sections' },
+						categoriesOf( tools ).map( function ( name ) {
+							var active = category === name;
+							return el(
+								'span',
+								{ key: name, className: 'rigpolice-embed__section-item' },
+								el(
+									cmp.Button,
+									{
+										variant: 'link',
+										className:
+											'rigpolice-embed__section' +
+											( active ? ' is-active' : '' ),
+										'aria-current': active || undefined,
+										onClick: function () {
+											setCategory( active ? '' : name );
+											focusPicker();
+										},
 									},
-								},
-								name
-							)
-						);
-					} )
+									name
+								)
+							);
+						} )
+					)
 				);
 
 				// Same reason the section filter sits above the input, and one more: passing this as the
@@ -299,7 +310,10 @@
 				// ComboboxControl (not SelectControl): a searchable input — the tool list is long, so
 				// filter-as-you-type beats scrolling. Built-in label filtering; reset clears to null.
 				var toolSelect = el( cmp.ComboboxControl, {
+					// Drawn in the caption row above instead, so the chips can share the line — but the
+					// control keeps the label for its accessible name, just hidden from view.
 					label: __( 'Tool', 'rigpolice-embed' ),
+					hideLabelFromVision: true,
 					value: tool,
 					options: toolOptions,
 					placeholder: __( 'Search tools…', 'rigpolice-embed' ),
