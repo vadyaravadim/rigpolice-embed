@@ -53,7 +53,7 @@ Thanks for giving it a try. — RigPolice
 = Add a tool to a post =
 
 1. Edit any post or page in the block editor and add the "RigPolice Tool" block.
-2. Pick a tool from the dropdown (the list is pulled live from RigPolice). For the sensitivity converter you can also preset a From/To game pair.
+2. Click the Tool field and pick a tool from the panel that opens: search the list, or narrow it to a section (mouse, keyboard, monitor, and so on). The catalog is pulled live from RigPolice. For the sensitivity converter you also pick a From and a To game the same way.
 3. Publish. The widget loads in its own frame and auto-resizes to fit, with no configuration, no accounts, and nothing to set up on the RigPolice side.
 
 The block requires the WordPress block editor (Gutenberg). On sites running the Classic Editor, switch the post to the block editor to add it.
@@ -98,6 +98,7 @@ RigPolice site and contact: https://rigpolice.com/about/
 = 1.4.8 =
 * Fixed the pickers ignoring the arrow keys: Up and Down now walk the suggestion list instead of throwing focus out of the field. Each picker is now a button showing what you picked, and it opens its searchable list in a panel of its own.
 * Fixed a tool that RigPolice has renamed or removed losing its title when you re-picked it in the editor: the block kept embedding the tool but quietly dropped the label the widget uses to name its frame. Re-picking the tool you already had no longer wipes the sensitivity converter's game pair either.
+* Fixed a game that RigPolice has renamed or removed vanishing from the sensitivity converter's picker: the pair was still saved on the block, but the field looked empty, as if you had never set it. The game now stays in the field, marked as no longer in the catalog, the way a renamed or removed tool already was.
 * Added a section filter to the tool picker: click mouse, keyboard, monitor, and so on to narrow the list to that section, and click it again to see everything. The sections come from RigPolice, so a new one appears on its own.
 * Made the tool picker easier to scan: each entry now reads "Tool name • section", so the tools group visibly by section the way they do on the RigPolice embed page.
 * The tool is now marked required, and so are both games on the sensitivity converter: the block tells you what is still missing instead of quietly publishing nothing, or a converter with no preset pair. Both sides list every game, so you can swap a pair around, and the block says so if you land on the same game twice — the widget needs two different games to open on a conversion.
