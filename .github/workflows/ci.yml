@@ -1,15 +1,22 @@
 name: CI
 
-# Two gates, both callable from release.yml so a tag can't deploy code that never passed them:
+# Three gates, all callable from release.yml so a tag can't deploy code that never passed them:
 #
 #   plugin-check    — WordPress.org compliance (escaping, readme, i18n, guidelines). Catches the class of
 #                     mistake that gets a release REJECTED by WP.org.
 #   render-contract — the front-end output contract of render.php, asserted against a real WordPress.
 #                     save() returns null, so render.php IS what readers get: a regression here ships.
-#                     This is the regression net — plugin-check cannot see it.
+#   editor-contract — the EDITOR contract, asserted by driving the real block editor in a real browser.
+#                     render-contract cannot see index.js at all, and index.js is where this block lives.
 #
-# Zero-build stays intact: no package.json, no composer.json. wp-env runs via npx (as it does locally) and
-# the plugin-check action brings its own WordPress.
+# Both contracts run at BOTH ENDS of the supported range — the `Requires at least: 6.3` floor and the current
+# release — and until now nothing tested the floor at all. 1.4.8 shipped `focusOnMount: 'firstInputElement'`,
+# a value that only exists in WordPress 7.0: on 6.3–6.9 the picker's popover focused its own container, the
+# tool list never expanded, and the arrow keys did nothing. Every gate stayed green, because they all ran the
+# single version pinned in .wp-env.json — the one where it worked.
+#
+# Zero-build stays intact: no package.json, no composer.json. wp-env and the browser harness run via npx/node
+# (as they do locally) and the plugin-check action brings its own WordPress.
 on:
   pull_request:
   push:
@@ -26,6 +33,12 @@ on:
           every open branch red the day WordPress ships a new version, with nobody having changed any code.
         type: boolean
         default: false
+
+# Each contracts job boots its own WordPress and a browser, so a superseded push must not keep paying for it.
+# Tags are exempt: a release run must never be cancelled by a later push.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith( github.ref, 'refs/tags/' ) }}
 
 jobs:
   plugin-check:
@@ -56,25 +69,78 @@ jobs:
           build-dir: ./build/rigpolice-embed
           ignore-codes: ${{ !inputs.strict-readme && 'outdated_tested_upto_header' || '' }}
 
-  render-contract:
-    name: Render contract (front-end output)
+  contracts:
+    name: Contracts (WP ${{ matrix.wp }})
     runs-on: ubuntu-latest
+    strategy:
+      # Each end reports independently: "the floor is broken, the current one is fine" is the whole point, and
+      # fail-fast would hide it behind the first red.
+      fail-fast: false
+      matrix:
+        # THE TWO ENDS of the supported range, not every version in it. The floor is `Requires at least: 6.3`
+        # (rigpolice-embed.php + readme.txt) and the ceiling is the current release. Testing the in-between
+        # versions buys almost nothing: core only ADDS component APIs across a range like this, so a value
+        # that exists in 6.3 still exists in 6.9, and one that works on both ends works between them. What
+        # actually bites is using something too NEW — which is exactly what the floor catches.
+        #
+        # Keep these two honest: raise the floor only by raising `Requires at least` in BOTH manifests, and
+        # move the ceiling when readme's "Tested up to" moves.
+        wp: [ '6.3', '7.0' ]
+    env:
+      # Overrides .wp-env.json's `core` for this job only, so the local stand keeps its own pin and no file
+      # has to change per matrix entry. A ZIP, not the `WordPress/WordPress#<ref>` git source the local stand
+      # uses: the git source partial-clones the whole repo (~440 MB with every branch and tag) where the zip
+      # is a single ~30 MB download.
+      WP_ENV_CORE: https://wordpress.org/wordpress-${{ matrix.wp }}.zip
+      # One PHP across the range, and it has to be one ALL of them support: WordPress 6.3 predates PHP 8.3
+      # (wp-env's default), and the plugin's floor is `Requires PHP: 7.4`. 8.1 is inside every version's
+      # supported set, so a red here is the plugin's fault and not the interpreter's.
+      WP_ENV_PHP_VERSION: '8.1'
+      WP_BASE_URL: http://localhost:9400
     steps:
       - uses: actions/checkout@v7
 
-      # The same stand used locally (.wp-env.json mounts the working tree as the plugin), so a failure here
-      # reproduces with one command on a laptop: `npx @wordpress/env start`.
-      - name: Start WordPress
-        run: npx --yes @wordpress/env start
+      # The browser harness talks CDP over Node's BUILT-IN WebSocket (no puppeteer, no playwright, nothing to
+      # install) — that global is only stable from Node 22.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Pinned. Everything else here is (actions/checkout@v7, plugin-check-action@v1.1.7), and an unpinned
+      # toolchain is the same failure this workflow's strict-readme comment argues against: a release upstream
+      # turns every branch red with nobody having changed any code.
+      - name: Start WordPress ${{ matrix.wp }}
+        run: npx --yes @wordpress/env@11.10.0 start
+
+      # ASSERT the version, don't just print it. If WP_ENV_CORE is ever ignored (wp-env silently falls back
+      # to the WordPress bundled in its Docker image when it believes it is offline — which is exactly what
+      # happens on a machine whose DNS probe fails), the matrix would run the SAME WordPress eight times and
+      # report eight greens. A matrix that tests one version while claiming to test eight is a worse lie than
+      # no matrix at all, so make that failure loud.
+      - name: Confirm the WordPress under test really is ${{ matrix.wp }}
+        run: |
+          actual=$(npx --yes @wordpress/env@11.10.0 run cli wp core version 2>/dev/null | tr -d '\r' | grep -E '^[0-9]+\.[0-9]+' | head -1)
+          echo "requested=${{ matrix.wp }} actual=$actual"
+          case "$actual" in
+            ${{ matrix.wp }}|${{ matrix.wp }}.*) ;;
+            *) echo "::error::asked for WordPress ${{ matrix.wp }} but the stand is running '$actual' — WP_ENV_CORE was not honored, so this job would have tested the wrong version"; exit 1 ;;
+          esac
 
       # eval-file, not a shell of assertions: the test drives the REAL render.php through do_blocks() in a
       # real WordPress. Exit code 1 on any failed assertion fails the job.
-      - name: Assert the block's rendered output
-        run: npx --yes @wordpress/env run cli wp eval-file wp-content/plugins/rigpolice-embed/.github/render-contract.php
+      - name: Render contract (render.php output)
+        run: npx --yes @wordpress/env@11.10.0 run cli wp eval-file wp-content/plugins/rigpolice-embed/.github/render-contract.php
+
+      # Drives the real editor in headless Chrome (preinstalled on ubuntu-latest) and asserts the picker
+      # behaviour that is WordPress-version dependent. This is the ONLY gate that would have caught the 1.4.8
+      # focusOnMount regression, and it is the reason the matrix exists.
+      - name: Editor contract (block editor behaviour)
+        run: node .github/editor-contract.mjs
 
   # A SIGNAL, not a gate (continue-on-error): the editor fills its pickers from these two live catalogs, so a
   # dead or malformed one breaks the editor with no plugin change — worth knowing, but it is not the PR's
-  # fault and must never block a merge on a network hiccup.
+  # fault and must never block a merge on a network hiccup. (The editor contract does NOT depend on this: it
+  # stubs both catalogs at the network layer, so it tests the block, not rigpolice.com.)
   catalog-alive:
     name: Catalogs reachable (signal only)
     runs-on: ubuntu-latest
@@ -84,10 +150,14 @@ jobs:
         run: |
           fail=0
           for url in https://rigpolice.com/embeds.json https://rigpolice.com/games.json; do
-            body=$(curl -fsS --max-time 20 "$url") || { echo "::warning::$url is unreachable"; fail=1; continue; }
+            # -L: index.js uses fetch(), which FOLLOWS redirects. Without it a 301 (origin -> CDN, http ->
+            # https) would warn about a catalog the editor loads perfectly.
+            body=$(curl -fsSL --max-time 20 "$url") || { echo "::warning::$url is unreachable"; fail=1; continue; }
             # index.js treats a 2xx non-array body as a failure (error envelope, soft-404 HTML that parsed),
-            # not as an empty catalog — mirror that here so this signal means what the editor means.
-            echo "$body" | grep -q '^\s*\[' || { echo "::warning::$url did not return a JSON array"; fail=1; continue; }
+            # not as an empty catalog — mirror that here so this signal means what the editor means. jq, not
+            # grep: `grep '^\s*\['` matches any LINE that opens a bracket, so a nested array inside an error
+            # envelope would pass. This asserts the whole body IS an array, which is what Array.isArray does.
+            echo "$body" | jq -e 'type == "array"' >/dev/null 2>&1 || { echo "::warning::$url did not return a JSON array"; fail=1; continue; }
             echo "$url: ok"
           done
           exit "$fail"

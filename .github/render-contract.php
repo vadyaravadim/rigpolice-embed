@@ -108,6 +108,13 @@ $html = rpe_render( array( 'tool' => 'x" onload="alert(1)', 'anchor' => 'a"b' ) 
 rpe_ok( false === strpos( $html, 'onload="alert(1)"' ), 'quote in tool cannot break out of the attribute', $html );
 rpe_ok( false !== strpos( $html, '&quot;' ), 'quotes are escaped', $html );
 
+// 7. data-anchor is emitted even when EMPTY. embed.js reads it with no fallback, and an empty anchor is
+// reachable: a tool dropped from the catalog has no row to bake one from. Every OTHER assertion above hands
+// render.php a non-empty anchor, so on its own the suite stays green against a regression that wraps the
+// attribute in `if ( '' !== $anchor )` — the attribute would vanish and nothing here would notice.
+$html = rpe_render( array( 'tool' => 'test-tool' ) );
+rpe_ok( false !== strpos( $html, 'data-anchor=""' ), 'data-anchor is emitted even when empty', $html );
+
 $tally = rpe_ok( null );
 echo "\n{$tally['passed']} passed, {$tally['failed']} failed\n";
 exit( $tally['failed'] > 0 ? 1 : 0 );
