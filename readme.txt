@@ -97,9 +97,10 @@ RigPolice site and contact: https://rigpolice.com/about/
 
 = 1.4.8 =
 * Fixed the pickers ignoring the arrow keys: Up and Down now walk the suggestion list instead of throwing focus out of the field. Each picker is now a button showing what you picked, and it opens its searchable list in a panel of its own.
+* Fixed a tool that RigPolice has renamed or removed losing its title when you re-picked it in the editor: the block kept embedding the tool but quietly dropped the label the widget uses to name its frame. Re-picking the tool you already had no longer wipes the sensitivity converter's game pair either.
 * Added a section filter to the tool picker: click mouse, keyboard, monitor, and so on to narrow the list to that section, and click it again to see everything. The sections come from RigPolice, so a new one appears on its own.
 * Made the tool picker easier to scan: each entry now reads "Tool name • section", so the tools group visibly by section the way they do on the RigPolice embed page.
-* The tool is now marked required, and so are both games on the sensitivity converter: the block tells you what is still missing instead of quietly publishing nothing, or a converter with no preset pair. The game you pick on one side is no longer offered on the other.
+* The tool is now marked required, and so are both games on the sensitivity converter: the block tells you what is still missing instead of quietly publishing nothing, or a converter with no preset pair. Both sides list every game, so you can swap a pair around, and the block says so if you land on the same game twice — the widget needs two different games to open on a conversion.
 * Added a link under the picker to the RigPolice embed page, where every tool is listed by section with a live demo, so you can see what a tool does before picking it.
 
 = 1.4.7 =

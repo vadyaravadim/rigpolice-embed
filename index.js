@@ -15,6 +15,8 @@
 	var useState = wp.element.useState;
 	var useEffect = wp.element.useEffect;
 	var useRef = wp.element.useRef;
+	var useMemo = wp.element.useMemo;
+	var useCallback = wp.element.useCallback;
 	var Fragment = wp.element.Fragment;
 	var createInterpolateElement = wp.element.createInterpolateElement;
 	var useBlockProps = wp.blockEditor.useBlockProps;
@@ -67,6 +69,17 @@
 	function findBySlug( list, slug ) {
 		return list.find( function ( row ) {
 			return row.slug === slug;
+		} );
+	}
+
+	// The saved slugs a catalog no longer has (renamed/removed on the site). Read by the pickers, which owe
+	// each one a synthetic option — ComboboxControl is controlled by `value`, so a value with no matching
+	// option renders the field BLANK: the author would see no selection while render.php still embeds the
+	// slug — and by the lines that warn about them. from/to can legitimately repeat in older content, so
+	// dedupe rather than offering the same slug twice.
+	function orphanSlugs( list, slugs ) {
+		return slugs.filter( function ( slug, i, all ) {
+			return slug && all.indexOf( slug ) === i && ! findBySlug( list, slug );
 		} );
 	}
 
@@ -125,11 +138,22 @@
 			{ className: 'rigpolice-embed__field' },
 			el( 'span', { className: 'rigpolice-embed__field-label' }, config.label ),
 			el( cmp.Dropdown, {
-				// A caption row (the tool picker's section chips) comes first in the popover, so the
-				// default ('firstElement') would open the picker with a section focused. 'firstInputElement'
-				// hands focus to the search field itself, which is also what makes the control expand its
-				// list: the popover opens ready to type or arrow through.
-				focusOnMount: 'firstInputElement',
+				// focusOnMount is left at core's default ('firstElement') ON PURPOSE. The mode that would
+				// say "focus the search field" directly, 'firstInputElement', only exists in WordPress 7.0,
+				// and this plugin supports 6.3: on every older release useFocusOnMount does
+				// `if (mode !== 'firstElement') focus(node)`, so the unknown string focuses the popover
+				// CONTAINER, the control never expands its list, and the arrow keys the popover exists for
+				// do nothing. Do NOT pass `false` either — Popover derives constrainTabbing and
+				// focus-return-on-close from `focusOnMount !== false`.
+				//
+				// What each picker relies on to land focus in the field therefore DIFFERS, and the
+				// difference is load-bearing:
+				//   - a picker WITH a caption row (the tool picker) would see 'firstElement' focus the
+				//     caption's first button, so it passes `contentRef` and focuses the input itself.
+				//   - a picker WITHOUT one (both game pickers) has the input as its first tabbable already,
+				//     so core's default is correct and no ref is needed.
+				// Give a game picker a caption and it silently regresses to focusing a chip — hand it a
+				// `contentRef` at the same time.
 				popoverProps: { className: 'rigpolice-embed__picker' },
 				renderToggle: function ( picker ) {
 					return el(
@@ -195,8 +219,15 @@
 					);
 				},
 			} ),
+			// role="alert": the line appears while focus is elsewhere — a reset leaves the popover open, so
+			// the field goes invalid behind it — and aria-describedby alone is only read once the toggle is
+			// focused again (WCAG 2.1 SC 4.1.3, Status Messages).
 			config.error &&
-				el( 'p', { className: 'rigpolice-embed__error', id: errorId }, config.error )
+				el(
+					'p',
+					{ className: 'rigpolice-embed__error', id: errorId, role: 'alert' },
+					config.error
+				)
 		);
 	}
 
@@ -227,21 +258,39 @@
 			var category = categoryState[ 0 ];
 			var setCategory = categoryState[ 1 ];
 
-			// Picking a section is the first half of picking a tool, so hand the author straight to the
-			// (now narrowed) list. ComboboxControl takes no ref to its input, so reach it through a
-			// wrapper: focusing the input is what makes the control open its own suggestions.
-			// Query by role, not by core's `components-combobox-control__input` class: role="combobox" is
-			// part of the control's ARIA contract, the class name is a private styling detail core renames
-			// freely (and a miss here fails silently — no focus, no error).
-			var pickerRef = useRef( null );
+			// Focusing the search field is what makes ComboboxControl expand its list, so it has to happen
+			// both when the popover opens and after a section chip is clicked (picking a section is the
+			// first half of picking a tool — hand the author straight to the narrowed list).
+			// ComboboxControl exposes no ref to its input, so reach it through the wrapper. Query by role,
+			// not by core's `components-combobox-control__input` class: role="combobox" is part of the
+			// control's ARIA contract, the class name is a private styling detail core renames freely (and
+			// a miss here fails silently — no focus, no error).
+			var pickerNode = useRef( null );
 			function focusPicker() {
 				var input =
-					pickerRef.current &&
-					pickerRef.current.querySelector( 'input[role="combobox"]' );
+					pickerNode.current &&
+					pickerNode.current.querySelector( 'input[role="combobox"]' );
 				if ( input ) {
 					input.focus();
 				}
 			}
+
+			// A CALLBACK ref, because opening the popover has to focus the field and core cannot do it for
+			// us: the tool picker's caption row comes first, so Dropdown's default focusOnMount
+			// ('firstElement') would land on a section chip, and the mode that means "the input"
+			// ('firstInputElement') only shipped in WordPress 7.0 — this plugin supports 6.3.
+			//
+			// Running here is enough to win: React attaches a child's ref before its parent's, so this fires
+			// before the Popover root's useFocusOnMount, which then finds focus already inside the popover
+			// and returns early (`if ( node.contains( activeElement ) ) return;` — present unchanged from 6.3
+			// through 7.0). Identity must be STABLE (deps []): a fresh function each render would make React
+			// detach and re-attach the ref every time, stealing focus back mid-keystroke.
+			var pickerContentRef = useCallback( function ( node ) {
+				pickerNode.current = node;
+				if ( node ) {
+					focusPicker();
+				}
+			}, [] );
 
 			useEffect( function () {
 				var alive = true;
@@ -266,6 +315,79 @@
 					alive = false;
 				};
 			}, [] );
+
+			// Both option lists are MEMOIZED, and not as a micro-optimisation. ComboboxControl memoizes its
+			// filtered suggestions on the `options` IDENTITY, then locates the highlighted row with
+			// indexOf() on the option OBJECT. A fresh array every render therefore makes the author's
+			// arrow-key selection unfindable, and the control snaps the highlight back to the first row and
+			// re-announces the result count — on ANY unrelated re-render of this block while a picker is
+			// open (dragging Max width is enough). Memoizing keeps the identity stable until the list really
+			// changes. Hoisted above the catalog branches below because hooks cannot run conditionally.
+
+			// Option order IS catalog order: embeds.json already ships the tools grouped by category (all
+			// mouse, then monitor, …), matching the sections on /embed-tools/, so the picker groups for
+			// free — don't re-sort, it would just duplicate the catalog's own ordering.
+			var toolOptions = useMemo(
+				function () {
+					if ( ! Array.isArray( tools ) ) {
+						return [];
+					}
+
+					// The section filter never hides the SELECTED tool — a controlled value with no
+					// matching option renders the field blank.
+					var options = tools
+						.filter( function ( t ) {
+							return ! category || t.category === category || t.slug === tool;
+						} )
+						.map( function ( t ) {
+							return { label: t.title + ' • ' + t.category, value: t.slug };
+						} );
+
+					return options.concat(
+						orphanSlugs( tools, [ tool ] ).map( function ( slug ) {
+							return {
+								label:
+									slug +
+									' ' +
+									__( '(no longer in the catalog)', 'rigpolice-embed' ),
+								value: slug,
+							};
+						} )
+					);
+				},
+				[ tools, category, tool ]
+			);
+
+			// ONE list for BOTH ends, listing every game. Neither end hides the game the other holds —
+			// filtering it out (as 1.4.8 did) makes a SWAP unreachable in the picker: to turn from=A,to=B
+			// into from=B,to=A, each end has to pass through the value the other still holds, and each end
+			// had filtered away exactly that game. Both ends therefore list everything, the pair goes through
+			// a transient from===to, and the error line names it — which is where render.php draws the line
+			// anyway (it emits the pair only when the two are set AND differ).
+			var gameOptions = useMemo(
+				function () {
+					if ( ! Array.isArray( games ) ) {
+						return [];
+					}
+
+					var options = games.map( function ( g ) {
+						return { label: g.name, value: g.slug };
+					} );
+
+					return options.concat(
+						orphanSlugs( games, [ from, to ] ).map( function ( slug ) {
+							return {
+								label:
+									slug +
+									' ' +
+									__( '(no longer in the catalog)', 'rigpolice-embed' ),
+								value: slug,
+							};
+						} )
+					);
+				},
+				[ games, from, to ]
+			);
 
 			var blockProps = useBlockProps();
 
@@ -327,33 +449,12 @@
 					el( cmp.Spinner )
 				);
 			} else {
-				// Option order IS catalog order: embeds.json already ships the tools grouped by
-				// category (all mouse, then monitor, …), matching the sections on /embed-tools/. So the
-				// picker groups for free — don't re-sort here, it would just duplicate the catalog's own
-				// ordering.
-				// The section filter never hides the SELECTED tool: ComboboxControl is controlled by
-				// `value`, so a value with no matching option renders the field blank — the author would
-				// see no selection while render.php still embeds the stale data-tool.
-				var toolOptions = tools
-					.filter( function ( t ) {
-						return ! category || t.category === category || t.slug === tool;
-					} )
-					.map( function ( t ) {
-						return { label: t.title + ' • ' + t.category, value: t.slug };
-					} );
-
 				var selected = findBySlug( tools, tool );
 
-				// A saved slug missing from the fresh catalog (tool renamed/removed on the site) has no row
-				// to build an option from — same blank-picker problem, so keep the value visible with a
-				// synthetic option and warn.
+				// A saved slug missing from the fresh catalog (tool renamed/removed on the site). It still
+				// embeds, so it is warned about rather than errored on; toolOptions above keeps it
+				// selectable.
 				var orphaned = tool && ! selected;
-				if ( orphaned ) {
-					toolOptions = toolOptions.concat( {
-						label: tool + ' ' + __( '(no longer in the catalog)', 'rigpolice-embed' ),
-						value: tool,
-					} );
-				}
 
 				var instructions;
 				if ( selected ) {
@@ -366,8 +467,13 @@
 						' px. ' +
 						__( 'The frame auto-resizes to fit your page.', 'rigpolice-embed' );
 				} else if ( orphaned ) {
+					// "remove the block", not "reset the field". A tool is REQUIRED, so clearing it back to
+					// empty only trades this warning for an error — and the control's reset (X) is a poor
+					// thing to send anyone to anyway: core renders it only while the combobox is COLLAPSED,
+					// but the popover opens with the field focused (and so expanded), so the X appears only
+					// after the author blurs the input, which nothing on screen suggests doing.
 					instructions = __(
-						'The saved tool is no longer in the RigPolice catalog. It still embeds on the page — pick a replacement, or reset to remove it.',
+						'The saved tool is no longer in the RigPolice catalog. It still embeds on the page — pick a replacement, or remove the block.',
 						'rigpolice-embed'
 					);
 				} else {
@@ -443,7 +549,7 @@
 					id: fieldId + '-tool',
 					label: __( 'Tool', 'rigpolice-embed' ),
 					caption: sectionFilter,
-					contentRef: pickerRef,
+					contentRef: pickerContentRef,
 					value: tool,
 					valueLabel: toolLabel,
 					emptyLabel: __( 'Choose a tool', 'rigpolice-embed' ),
@@ -455,16 +561,29 @@
 					// Bake the picked tool's anchor into the block (embed.js reads data-anchor with no
 					// fallback) and reset the game pair — from/to only apply to the converter.
 					onChange: function ( value ) {
+						// Re-picking the tool already selected is a no-op, NOT a reset: the author often
+						// reopens the picker just to browse. Without this guard, confirming the same
+						// converter would wipe a game pair they had already configured, and the pair's own
+						// error line would then blame them for it.
+						if ( value === tool ) {
+							return;
+						}
+
+						var next = { tool: value || '', from: '', to: '' };
+
+						// Only a real catalog row rewrites the anchor. An ORPHANED slug has no row — that is
+						// what orphaned means — so re-selecting it from its synthetic option must KEEP the
+						// anchor the block already carries. Blanking it would ship data-anchor="", and
+						// embed.js reads that with no fallback for the iframe title.
 						var picked = findBySlug( tools, value );
-						setAttributes( {
-							tool: value || '',
-							anchor: picked ? picked.anchor : '',
-							from: '',
-							to: '',
-						} );
+						if ( picked ) {
+							next.anchor = picked.anchor;
+						}
+
+						setAttributes( next );
+
 						// The section was a route to a tool, so picking one retires it — otherwise it
-						// outlives its purpose and silently keeps the next browse narrowed. Not on reset
-						// (value === null): that clears the field, not the way the author is browsing.
+						// outlives its purpose and silently keeps the next browse narrowed.
 						if ( value ) {
 							setCategory( '' );
 						}
@@ -475,14 +594,15 @@
 				//
 				// Both are required, and again render.php draws the line: it emits the pair only when both
 				// are set AND differ (embed.js's own guard), so a half-filled or repeated pair is not "a
-				// partial preset" — it is silently NO preset. The repeat is made unpickable rather than
-				// errored on: each end's list drops the game the other end holds.
+				// partial preset" — it is silently NO preset. Both states are therefore ERRORED on rather
+				// than made unpickable: hiding the other end's game from each list is what made a swap
+				// impossible (see gameOptions).
 				var pairPicker = null;
 				if ( selected && selected.preset === 'pair' ) {
 					if ( games === false ) {
 						pairPicker = el(
 							'p',
-							{ className: 'rigpolice-embed__error' },
+							{ className: 'rigpolice-embed__error', role: 'alert' },
 							__(
 								'Could not load the game list from rigpolice.com. Reload the editor to pick the converter’s games.',
 								'rigpolice-embed'
@@ -491,21 +611,42 @@
 					} else if ( games === null ) {
 						pairPicker = el( cmp.Spinner );
 					} else {
-						// ONE line for the two fields, not one each: the rule is about the pair, and the
-						// same sentence printed twice under two empty fields says nothing twice. Both
-						// buttons point at it, so either one announces it.
+						// ONE line for the two fields, not one each: every rule here is about the PAIR, and
+						// the same sentence printed twice under two fields says nothing twice. Both buttons
+						// point at it, so either one announces it.
+						//
+						// The three states mirror render.php's guard exactly — it emits the pair only when
+						// both are set AND they differ (embed.js's own rule). Anything else is not "a partial
+						// preset", it is silently NO preset, so the editor must not call the block complete.
 						var pairErrorId = fieldId + '-pair-error';
-						var pairError =
-							from && to
-								? null
-								: __(
-										'Required — without both games the converter embeds with no preset.',
-										'rigpolice-embed'
-								  );
+						var strandedGames = orphanSlugs( games, [ from, to ] );
+						var pairError = null;
+						if ( ! from || ! to ) {
+							pairError = __(
+								'Required — without both games the converter embeds with no preset.',
+								'rigpolice-embed'
+							);
+						} else if ( from === to ) {
+							// Reachable from older content (before 1.4.8 both ends listed every game), and
+							// reachable now while an author swaps the pair one end at a time.
+							pairError = __(
+								'Pick two different games — while both ends match, the converter embeds with no preset.',
+								'rigpolice-embed'
+							);
+						} else if ( strandedGames.length ) {
+							pairError = sprintf(
+								/* translators: %s: comma-separated game slugs that are no longer in the catalog. */
+								__(
+									'%s is no longer in the RigPolice catalog. It still embeds — pick a replacement.',
+									'rigpolice-embed'
+								),
+								strandedGames.join( ', ' )
+							);
+						}
 
-						// One config, two ends: save() keys differ (from/to), so onChange is passed in, and
-						// `other` is the game the opposite end already holds.
-						function gamePicker( key, label, value, other, save ) {
+						// One config, two ends: save() keys differ (from/to), so onChange is passed in. Both
+						// ends share gameOptions — see there for why neither hides the other's game.
+						function gamePicker( key, label, value, save ) {
 							var game = findBySlug( games, value );
 							return pickerField( {
 								id: fieldId + '-' + key,
@@ -515,16 +656,7 @@
 								valueLabel: game ? game.name : value,
 								emptyLabel: __( 'Choose a game', 'rigpolice-embed' ),
 								describedBy: pairError ? pairErrorId : undefined,
-								options: games
-									.filter( function ( g ) {
-										// Keep the saved value listed even if the other end repeats it
-										// (older content could): a controlled value with no matching option
-										// renders the field blank, and the author would see no selection.
-										return g.slug !== other || g.slug === value;
-									} )
-									.map( function ( g ) {
-										return { label: g.name, value: g.slug };
-									} ),
+								options: gameOptions,
 								placeholder: __( 'Search games…', 'rigpolice-embed' ),
 								onChange: function ( v ) {
 									save( v || '' );
@@ -534,16 +666,20 @@
 						pairPicker = el(
 							'div',
 							{ className: 'rigpolice-embed__pair' },
-							gamePicker( 'from', __( 'From game', 'rigpolice-embed' ), from, to, function ( v ) {
+							gamePicker( 'from', __( 'From game', 'rigpolice-embed' ), from, function ( v ) {
 								setAttributes( { from: v } );
 							} ),
-							gamePicker( 'to', __( 'To game', 'rigpolice-embed' ), to, from, function ( v ) {
+							gamePicker( 'to', __( 'To game', 'rigpolice-embed' ), to, function ( v ) {
 								setAttributes( { to: v } );
 							} ),
 							pairError &&
 								el(
 									'p',
-									{ className: 'rigpolice-embed__error', id: pairErrorId },
+									{
+										className: 'rigpolice-embed__error',
+										id: pairErrorId,
+										role: 'alert',
+									},
 									pairError
 								)
 						);
