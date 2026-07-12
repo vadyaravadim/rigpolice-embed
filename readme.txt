@@ -4,7 +4,7 @@ Tags: gaming, speed test, calculator, interactive, diagnostics
 Requires at least: 6.3
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.4.8
+Stable tag: 1.4.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -94,6 +94,10 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.9 =
+* Fixed the block growing a strip of empty space in the editor once the sensitivity converter had both of its games picked: the two game fields stretched to twice their height for no reason. Editor-only, nothing about the embedded tool changed.
+* The tool picker now spans the full width of the block, lining up with the converter's game fields underneath it.
 
 = 1.4.8 =
 * Fixed the pickers ignoring the arrow keys: Up and Down now walk the suggestion list instead of throwing focus out of the field. Each picker is now a button showing what you picked, and it opens its searchable list in a panel of its own.
