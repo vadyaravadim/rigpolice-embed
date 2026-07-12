@@ -17,7 +17,16 @@ permissions:
   contents: write # create the release + upload the asset
 
 jobs:
+  # Gate BOTH deploys on the same checks the branches run — a tag must not ship code that never passed them.
+  # strict-readme: a stale "Tested up to" blocks the RELEASE (the reminder belongs here) while branch runs
+  # keep it muted, so a new WordPress version can't turn every open branch red on its own.
+  ci:
+    uses: ./.github/workflows/ci.yml
+    with:
+      strict-readme: true
+
   release:
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -70,6 +79,7 @@ jobs:
   # bare `1.4.1`, and they must match. Requires two repo secrets: SVN_USERNAME + SVN_PASSWORD (the
   # WordPress.org SVN password, NOT the account password).
   wordpress-org:
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
