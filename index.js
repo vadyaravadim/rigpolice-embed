@@ -387,8 +387,8 @@
 				body = el(
 					cmp.Placeholder,
 					{ label: LABEL, instructions: instructions },
-					sectionFilter,
 					toolsPageLink,
+					sectionFilter,
 					el( 'div', { ref: pickerRef }, toolSelect ),
 					pairPicker
 				);

@@ -17,15 +17,17 @@
 	align-items: stretch;
 }
 
-/* The field's caption row: "Tool" left, sections right. `wrap` so the chips drop to their own line
- * rather than squeezing the label when the block is narrow. */
+/* The field's caption row: "Tool" then the sections, sitting directly on top of the input. The fieldset
+ * is a column flex container with a 16px gap, which would otherwise float this row away from the field
+ * it captions — the negative margin cancels that gap, since the control's own label is hidden. `wrap`
+ * lets the chips drop to their own line rather than squeezing the label when the block is narrow. */
 .wp-block-rigpolice-embed .rigpolice-embed__caption {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: baseline;
-	justify-content: space-between;
 	column-gap: 12px;
 	row-gap: 4px;
+	margin-bottom: -12px;
 }
 
 /* Matches core's `.components-base-control__label` — this row replaces it visually, while the control
