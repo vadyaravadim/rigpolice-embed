@@ -14,6 +14,46 @@ live in the editor to fill its pickers: `rigpolice.com/embeds.json` (tools) + `r
 WP's KSES never strips it (a static `save()` output would be filtered for non-admin editors). The editor
 (`index.js`) fetches the two catalogs live to fill the tool + game pickers.
 
+## Core principle — the code carries no comments
+
+**Where does an invariant live so it reaches whoever is about to break it?** Not in a `//` beside the
+code. It goes into `.claude/rules/*.md` (path-scoped, auto-loaded when a matching file is read) or into
+this file. The knowledge is not deleted, it is RELOCATED to where it is read.
+
+Why, and it is not taste: a comment is seen only if an agent happens to open that exact line, while a
+path-scoped rule enters its context BEFORE the edit. A comment also rots silently — the code moves, the
+comment keeps describing the old shape, and nothing turns red. A rule is ONE place, so a stale one is
+findable and fixable once.
+
+**The rule: code contains NO comments,** enforced by the `no-comments` CI job — three real parsers, and
+still **zero dependencies** (the repo has no `package.json` and must not get one):
+
+- **JS** (`index.js`, `.github/*.mjs`) — `npx --yes eslint@9 .` against `eslint.config.mjs`, which
+  imports nothing and defines the rule inline. `--fix` strips.
+- **CSS** (`editor.css`) — `.github/no-comments-css.mjs`, a quote-aware scanner (`content: "/*"` is legal
+  CSS, so a regex would cut from inside a string).
+- **PHP** (all `*.php`) — `.github/no-comments.php` over `token_get_all()`, the real PHP tokenizer.
+
+**The allowlist is whatever a MACHINE reads — and in WordPress that is more than elsewhere.** These are
+syntax, not commentary; deleting one breaks the platform, not the style:
+
+| Comment | Read by | If deleted |
+| --- | --- | --- |
+| The `/** Plugin Name: … Version: … Text Domain: … */` header in `rigpolice-embed.php` | WordPress core; `get_file_data()` (the `block_type_metadata` filter reads the version back out of it); `release.yml`'s tag-vs-version gate; Plugin Check | **WordPress stops seeing the plugin at all** |
+| `// phpcs:disable` / `// phpcs:enable` in `render.php` | the Plugin Check job | Plugin Check reds the release (WPCS does not know `wp_get_script_tag()` escapes) |
+| `/* translators: … */` in `index.js` | the WP i18n extractor (into the `.pot`) | translators lose the context |
+
+**Do NOT widen it beyond that.** An allowlist is a bypass hatch by construction, and a word-PREFIX match
+leaks (in the sibling repo an entry for the `global` directive let a comment opening "global handler
+with…" survive a full strip). Match the exact directive.
+
+**What this obliges you to do:** write a change's rationale into the matching `.claude/rules/*.md` in the
+SAME edit; never leave a comment-only block empty; never make a generator emit comments; never disable
+the rule. If a fact seems to need a comment, that is the signal it belongs in a rule file.
+
+Rules: `.claude/rules/editor.md` (index.js / editor.css), `.claude/rules/php.md` (render.php / the plugin
+entry), `.claude/rules/ci.md` (the gates and the contract harnesses).
+
 ## Release workflow — branch → merge → tag
 
 Work on a feature branch (e.g. `release/x.y.z`), merge into `main` (`--no-ff` keeps the release legible),

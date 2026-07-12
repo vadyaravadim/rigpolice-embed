@@ -1,25 +1,3 @@
-/**
- * Editor contract for the rigpolice/embed block — the regression gate render-contract.php CANNOT be.
- *
- * render-contract.php asserts render.php's OUTPUT. It says nothing about index.js, and index.js is where
- * this block actually lives: it drives core's Dropdown / Popover / ComboboxControl, whose behaviour is
- * WordPress-VERSION dependent. 1.4.8 shipped `focusOnMount: 'firstInputElement'` — a value that only exists
- * in WordPress 7.0 — while the plugin declares `Requires at least: 6.3`. On every older release the popover
- * focused its own container, the suggestion list never expanded, and the arrow keys the popover exists for
- * did nothing. Every PHP gate stayed green, because none of them opens the editor.
- *
- * So: boot the REAL editor on each WordPress we promise to support and drive the picker with REAL key
- * events. Run under ci.yml's matrix (WP_ENV_CORE), which is what turns this from one check into a
- * statement about the whole support range.
- *
- * Zero dependencies on purpose (the plugin has none, and CI should not need a browser SDK): headless Chrome
- * over the DevTools protocol, on Node's built-in WebSocket.
- *
- * The catalogs are STUBBED at the network layer. The editor fills its pickers from rigpolice.com, and a gate
- * that fails when a live site hiccups is a gate people learn to ignore — this asserts OUR code against
- * CORE's components, so the catalog is a fixture, not a dependency. (Catalog liveness is a separate,
- * non-blocking signal in ci.yml.)
- */
 
 import { spawn } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
@@ -31,13 +9,8 @@ const BASE = process.env.WP_BASE_URL || 'http://localhost:9400';
 const USER = 'admin';
 const PASS = 'password';
 
-// A THROWAWAY profile and a Chrome-chosen port, not a fixed one. With a fixed port a leftover browser from
-// an earlier run is silently attached to instead of the one just spawned, and the script then waits forever
-// on a page that will never navigate. Chrome writes the port it actually bound to into DevToolsActivePort.
 const PROFILE = mkdtempSync( join( tmpdir(), 'rpe-editor-contract-' ) );
 
-// Two tools in one category and one in another, so the section filter has something to narrow, plus the
-// converter (preset: 'pair') so the game pickers render. Anchors are what the editor bakes into the block.
 const EMBEDS = [
 	{ slug: 'mouse-test', title: 'Mouse Test', category: 'mouse', anchor: 'Mouse tester', width: 640, height: 480 },
 	{ slug: 'cps-test', title: 'CPS Test', category: 'mouse', anchor: 'CPS checker', width: 640, height: 480 },
@@ -73,7 +46,6 @@ function ok( cond, name, detail = '' ) {
 	}
 }
 
-/** Minimal CDP client: one WebSocket, id-matched replies, event listeners. */
 class Cdp {
 	constructor( ws ) {
 		this.ws = ws;
@@ -102,7 +74,6 @@ class Cdp {
 		this.listeners.set( method, ( this.listeners.get( method ) || [] ).concat( fn ) );
 	}
 
-	/** Evaluate in the page and return the value (throws on a page-side exception). */
 	async eval( expression ) {
 		const r = await this.send( 'Runtime.evaluate', {
 			expression: `(async () => { ${ expression } })()`,
@@ -115,8 +86,6 @@ class Cdp {
 		return r.result.value;
 	}
 
-	/** Poll the page until `expression` returns truthy. A mid-navigation page throws (no document.body
-	 * yet, wp not defined yet) — that is just "not ready", so swallow it and keep polling. */
 	async until( expression, what, ms = 30000 ) {
 		const deadline = Date.now() + ms;
 		for (;;) {
@@ -125,7 +94,6 @@ class Cdp {
 					return;
 				}
 			} catch {
-				/* navigating — the execution context went away */
 			}
 			if ( Date.now() > deadline ) {
 				throw new Error( `timed out waiting for ${ what }` );
@@ -147,7 +115,6 @@ class Cdp {
 		await sleep( 120 );
 	}
 
-	/** Real mouse press/release at the centre of `selector` (a top-document element). */
 	async click( selector ) {
 		const box = await this.eval( `
 			const el = document.querySelector( ${ JSON.stringify( selector ) } );
@@ -177,8 +144,6 @@ async function main() {
 		process.exit( 1 );
 	}
 
-	// A gate that HANGS is worse than one that fails: CI would sit on it until the job timeout with no
-	// output. Cap the whole run.
 	const watchdog = setTimeout( () => {
 		console.log( 'FAIL - harness timed out' );
 		console.log( `\n${ passed } passed, ${ failed + 1 } failed` );
@@ -204,7 +169,6 @@ async function main() {
 
 	let cdp;
 	try {
-		// Chrome reports the port it bound to here once it is listening.
 		let port;
 		for ( let i = 0; i < 150; i++ ) {
 			try {
@@ -213,7 +177,6 @@ async function main() {
 					break;
 				}
 			} catch {
-				/* not written yet */
 			}
 			await sleep( 200 );
 		}
@@ -235,7 +198,6 @@ async function main() {
 					break;
 				}
 			} catch {
-				/* not up yet */
 			}
 			await sleep( 200 );
 		}
@@ -247,7 +209,6 @@ async function main() {
 		await cdp.send( 'Page.enable' );
 		await cdp.send( 'Runtime.enable' );
 
-		// Serve the catalogs from the fixtures above, so the gate tests the BLOCK, not rigpolice.com.
 		await cdp.send( 'Fetch.enable', {
 			patterns: [ { urlPattern: '*rigpolice.com/*.json*' } ],
 		} );
@@ -264,7 +225,6 @@ async function main() {
 			} );
 		} );
 
-		// Log in.
 		await cdp.send( 'Page.navigate', { url: `${ BASE }/wp-login.php` } );
 		await cdp.until( 'document.querySelector("#user_login")', 'the login form' );
 		await cdp.eval( `
@@ -275,14 +235,10 @@ async function main() {
 		` );
 		await cdp.until( 'document.body.classList.contains("wp-admin")', 'wp-admin' );
 
-		// Open a fresh post and insert the block. Driving wp.data beats clicking the inserter.
 		await cdp.send( 'Page.navigate', { url: `${ BASE }/wp-admin/post-new.php` } );
 		await cdp.until( 'window.wp && wp.data && wp.data.select("core/block-editor")', 'the block editor' );
-		// The canvas iframe is the signal that the editor has actually MOUNTED. Dispatching insertBlock
-		// before that lands in a store the editor then re-initialises from the post, and the block vanishes.
 		await cdp.until( 'document.querySelector("iframe[name=\\"editor-canvas\\"]")', 'the editor canvas' );
 		await cdp.eval( `
-			// The welcome modal steals focus and covers the canvas.
 			wp.data.dispatch( 'core/preferences' )?.set( 'core/edit-post', 'welcomeGuide', false );
 			return true;
 		` );
@@ -298,7 +254,6 @@ async function main() {
 			'the block to be inserted'
 		);
 
-		// The pickers live in the canvas iframe; the popover they open lives in the TOP document.
 		const TOGGLE = 'iframe[name="editor-canvas"]';
 		try {
 			await cdp.until(
@@ -306,8 +261,6 @@ async function main() {
 				'the tool picker button'
 			);
 		} catch ( e ) {
-			// Say WHY, instead of just "timed out": almost always either the block never registered or the
-			// catalog stub did not take (the Placeholder then shows a spinner or the load-failure notice).
 			const why = await cdp.eval( `
 				const f = document.querySelector( 'iframe[name="editor-canvas"]' );
 				const doc = f && f.contentDocument;
@@ -323,7 +276,6 @@ async function main() {
 			throw new Error( `${ e.message } — ${ JSON.stringify( why ) }` );
 		}
 
-		// Click the toggle. It is inside the iframe, so offset by the frame's own position.
 		const clicked = await cdp.eval( `
 			const f = document.querySelector( 'iframe[name="editor-canvas"]' );
 			const fr = f.getBoundingClientRect();
@@ -340,11 +292,8 @@ async function main() {
 				clickCount: 1,
 			} );
 		}
-		await sleep( 700 ); // useFocusOnMount focuses on a setTimeout(0); give the popover a beat.
+		await sleep( 700 );
 
-		// 1. THE regression. The popover's first tabbable is a SECTION CHIP (the caption row comes first),
-		// so core's own focusOnMount would land there. Focus must be in the SEARCH FIELD instead — that is
-		// what makes ComboboxControl expand its list, and it is exactly what broke on WP < 7.0 in 1.4.8.
 		const focus = await cdp.eval( `
 			const pop = document.querySelector( '.rigpolice-embed__picker' );
 			const a = document.activeElement;
@@ -370,7 +319,6 @@ async function main() {
 		);
 		ok( focus.options > 0, 'the suggestion list is expanded on open, with no typing', JSON.stringify( focus ) );
 
-		// 2. Arrow keys move the highlight — the whole reason the pickers moved into a popover.
 		const before = await cdp.eval(
 			`return document.querySelector('.rigpolice-embed__picker input[role=combobox]').getAttribute('aria-activedescendant');`
 		);
@@ -381,8 +329,6 @@ async function main() {
 		);
 		ok( before !== after, 'ArrowDown moves the highlighted suggestion', `${ before } -> ${ after }` );
 
-		// 3. Enter commits, and the picked tool's anchor is baked in (render.php always emits data-anchor,
-		// and embed.js reads it with no fallback).
 		await cdp.key( 'Enter', 'Enter', 13 );
 		await sleep( 500 );
 		const attrs = await cdp.eval( `
