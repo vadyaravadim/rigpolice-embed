@@ -17,6 +17,47 @@
 	align-items: stretch;
 }
 
+/* The fieldset is a column flex container with its own gap, so spacing is its job — a margin here would
+ * stack on top of that gap. `row-gap` only shows up once the chips wrap onto a second line. */
+.wp-block-rigpolice-embed .rigpolice-embed__sections {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	row-gap: 4px;
+}
+
+/* Sits above the input, not in the control's `help` slot — see index.js. Match core's help typography,
+ * which BaseControl would have supplied. */
+.wp-block-rigpolice-embed .rigpolice-embed__help {
+	margin: 0;
+	font-size: 12px;
+	font-style: normal;
+	color: #757575;
+}
+
+/* Only the underline is overridden — core's `.components-button.is-link` (the `variant: 'link'` buttons
+ * below) already sets the accent color, `height: auto` and `padding: 0`, and its color var carries an
+ * outer `--wp-components-color-accent` fallback that a local copy would drop. */
+.wp-block-rigpolice-embed .rigpolice-embed__section {
+	text-decoration: none;
+}
+
+/* The bullet is drawn by the ITEM WRAPPER, never by the button: a ::after on the button renders inside
+ * the button's own box, so the separator becomes part of the click target and the focus ring and
+ * underline stretch through it. Hanging it off the wrapper puts it outside the button by construction. */
+.wp-block-rigpolice-embed .rigpolice-embed__section-item:not( :last-child )::after {
+	content: "•";
+	margin: 0 6px;
+	color: #949494;
+}
+
+/* The active section is the current view, not a link to elsewhere — state it, don't just tint it. */
+.wp-block-rigpolice-embed .rigpolice-embed__section.is-active {
+	color: #1e1e1e;
+	font-weight: 600;
+	text-decoration: underline;
+}
+
 .wp-block-rigpolice-embed .components-combobox-control__suggestions-container {
 	position: relative;
 }

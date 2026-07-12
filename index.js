@@ -14,7 +14,9 @@
 	var el = wp.element.createElement;
 	var useState = wp.element.useState;
 	var useEffect = wp.element.useEffect;
+	var useRef = wp.element.useRef;
 	var Fragment = wp.element.Fragment;
+	var createInterpolateElement = wp.element.createInterpolateElement;
 	var useBlockProps = wp.blockEditor.useBlockProps;
 	var InspectorControls = wp.blockEditor.InspectorControls;
 	var cmp = wp.components;
@@ -22,7 +24,20 @@
 
 	var EMBEDS_URL = 'https://rigpolice.com/embeds.json';
 	var GAMES_URL = 'https://rigpolice.com/games.json';
+	var TOOLS_PAGE_URL = 'https://rigpolice.com/embed-tools/';
 	var LABEL = __( 'RigPolice Tool', 'rigpolice-embed' );
+
+	// The picker lists tool names only; the site's embed page shows each one with a description and a live
+	// demo. Interpolated (not concatenated) so translators get the whole sentence with the link in place.
+	var TOOLS_PAGE_HELP = createInterpolateElement(
+		__(
+			'Not sure which one? <a>Browse every embeddable tool</a> on RigPolice.',
+			'rigpolice-embed'
+		),
+		// ExternalLink, not a raw <a>: it carries core's target/rel, the external-link icon, and the
+		// screen-reader "(opens in a new tab)" text.
+		{ a: el( cmp.ExternalLink, { href: TOOLS_PAGE_URL } ) }
+	);
 
 	function fetchJson( url, onOk, onErr ) {
 		fetch( url )
@@ -53,6 +68,17 @@
 		} );
 	}
 
+	// The catalog's own category order, deduped — NOT a hardcoded list, so a section added on RigPolice
+	// shows up here without a plugin release (same reason the picker doesn't re-sort the tools).
+	function categoriesOf( list ) {
+		return list.reduce( function ( acc, t ) {
+			if ( t.category && acc.indexOf( t.category ) === -1 ) {
+				acc.push( t.category );
+			}
+			return acc;
+		}, [] );
+	}
+
 	registerBlockType( 'rigpolice/embed', {
 		edit: function ( props ) {
 			var tool = props.attributes.tool;
@@ -70,6 +96,27 @@
 			var gamesState = useState( null );
 			var games = gamesState[ 0 ];
 			var setGames = gamesState[ 1 ];
+
+			// Deliberately editor-only view state, not a block attribute — it's how the author browses
+			// the picker, not what gets published.
+			var categoryState = useState( '' );
+			var category = categoryState[ 0 ];
+			var setCategory = categoryState[ 1 ];
+
+			// Picking a section is the first half of picking a tool, so hand the author straight to the
+			// (now narrowed) list. ComboboxControl takes no ref to its input, so reach it through a
+			// wrapper: focusing the input is what makes the control open its own suggestions.
+			// Query by role, not by core's `components-combobox-control__input` class: role="combobox" is
+			// part of the control's ARIA contract, the class name is a private styling detail core renames
+			// freely (and a miss here fails silently — no focus, no error).
+			var pickerRef = useRef( null );
+			function focusPicker() {
+				var input =
+					pickerRef.current && pickerRef.current.querySelector( 'input[role="combobox"]' );
+				if ( input ) {
+					input.focus();
+				}
+			}
 
 			useEffect( function () {
 				var alive = true;
@@ -155,15 +202,26 @@
 					el( cmp.Spinner )
 				);
 			} else {
-				var toolOptions = tools.map( function ( t ) {
-					return { label: t.title + ' (' + t.category + ')', value: t.slug };
-				} );
+				// Option order IS catalog order: embeds.json already ships the tools grouped by
+				// category (all mouse, then monitor, …), matching the sections on /embed-tools/. So the
+				// picker groups for free — don't re-sort here, it would just duplicate the catalog's own
+				// ordering.
+				// The section filter never hides the SELECTED tool: ComboboxControl is controlled by
+				// `value`, so a value with no matching option renders the field blank — the author would
+				// see no selection while render.php still embeds the stale data-tool.
+				var toolOptions = tools
+					.filter( function ( t ) {
+						return ! category || t.category === category || t.slug === tool;
+					} )
+					.map( function ( t ) {
+						return { label: t.title + ' • ' + t.category, value: t.slug };
+					} );
 
 				var selected = findTool( tools, tool );
 
-				// A saved slug missing from the fresh catalog (tool renamed/removed on the site) would
-				// otherwise render the picker blank — the author sees no selection while render.php still
-				// embeds the stale data-tool. Keep the saved value visible with a synthetic option and warn.
+				// A saved slug missing from the fresh catalog (tool renamed/removed on the site) has no row
+				// to build an option from — same blank-picker problem, so keep the value visible with a
+				// synthetic option and warn.
 				var orphaned = tool && ! selected;
 				if ( orphaned ) {
 					toolOptions = toolOptions.concat( {
@@ -194,6 +252,50 @@
 					);
 				}
 
+				// Section filter, ABOVE the input: the open suggestions list is absolutely positioned over
+				// whatever follows the field (see editor.css), so anything below it is hidden exactly when
+				// the author is choosing. Clicking the active section again clears the filter.
+				//
+				// aria-current, not aria-pressed: the active section is the current view, not a pushed
+				// toggle. Button turns aria-pressed into its own `is-pressed` class and core paints that
+				// with a solid dark fill, which on a link-variant button renders the label as a black box.
+				var sectionFilter = el(
+					'div',
+					{ className: 'rigpolice-embed__sections' },
+					categoriesOf( tools ).map( function ( name ) {
+						var active = category === name;
+						return el(
+							'span',
+							{ key: name, className: 'rigpolice-embed__section-item' },
+							el(
+								cmp.Button,
+								{
+									variant: 'link',
+									className:
+										'rigpolice-embed__section' +
+										( active ? ' is-active' : '' ),
+									'aria-current': active || undefined,
+									onClick: function () {
+										setCategory( active ? '' : name );
+										focusPicker();
+									},
+								},
+								name
+							)
+						);
+					} )
+				);
+
+				// Same reason the section filter sits above the input, and one more: passing this as the
+				// control's `help` puts a FOCUSABLE <a> right after the field, and arrowing through the
+				// open suggestions scrolls the highlighted option into view — which hands focus to that
+				// next focusable node, so the arrow keys stop driving the list after the first press.
+				var toolsPageLink = el(
+					'p',
+					{ className: 'rigpolice-embed__help' },
+					TOOLS_PAGE_HELP
+				);
+
 				// ComboboxControl (not SelectControl): a searchable input — the tool list is long, so
 				// filter-as-you-type beats scrolling. Built-in label filtering; reset clears to null.
 				var toolSelect = el( cmp.ComboboxControl, {
@@ -211,6 +313,12 @@
 							from: '',
 							to: '',
 						} );
+						// The section was a route to a tool, so picking one retires it — otherwise it
+						// outlives its purpose and silently keeps the next browse narrowed. Not on reset
+						// (value === null): that clears the field, not the way the author is browsing.
+						if ( value ) {
+							setCategory( '' );
+						}
 					},
 					__next40pxDefaultSize: true,
 					__nextHasNoMarginBottom: true,
@@ -265,7 +373,9 @@
 				body = el(
 					cmp.Placeholder,
 					{ label: LABEL, instructions: instructions },
-					toolSelect,
+					sectionFilter,
+					toolsPageLink,
+					el( 'div', { ref: pickerRef }, toolSelect ),
 					pairPicker
 				);
 			}
