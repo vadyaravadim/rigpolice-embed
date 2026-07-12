@@ -1,22 +1,9 @@
-/* Editor-only styles for the RigPolice Tool block.
- *
- * Each picker is a button in the block that opens its list in a POPOVER, and the editor mounts popovers
- * in the TOP document — outside the canvas iframe, and so outside the block's own wrapper. Rules for what
- * is inside a popover therefore key off the popover's own class (`.rigpolice-embed__picker`), never off
- * `.wp-block-rigpolice-embed`, which only ever matches in the canvas. See index.js for why the lists have
- * to live out there: inside the canvas, the editor's writing flow eats their arrow keys.
- */
 
-/* The block Placeholder lays its controls out in a shrink-to-fit flex ROW, which would line the pickers
- * up beside the tools-page link. Stack them, each spanning the full fieldset width. */
 .wp-block-rigpolice-embed .components-placeholder__fieldset {
 	flex-direction: column;
 	align-items: stretch;
 }
 
-/* A picker field: its label above its button, its error line below. One gap for both, so the button sits
- * the same distance from each. Capped at the width of the popover it opens — a select stretched across a
- * wide placeholder is neither readable nor comfortably clickable. */
 .wp-block-rigpolice-embed .rigpolice-embed__field {
 	display: flex;
 	flex-direction: column;
@@ -24,16 +11,6 @@
 	max-width: 320px;
 }
 
-/* The button stands in for a select, so it should read as a field holding a value, not as a call to
- * action: core's button variants are all accent-blue or filled, so the look is keyed to SelectControl's
- * instead — its border, its radius, its text color — and the chevron carries the affordance. Everything
- * else (the 40px height, the focus ring) still comes from core's Button.
- *
- * Selectors carry the fieldset on purpose. A NARROW placeholder (core adds `is-medium`/`is-small`) hands
- * every `.components-button` inside it `justify-content: center` — right for its own rows of buttons,
- * wrong for a field, whose value belongs left and whose chevron belongs right. That rule is three classes
- * deep, so anything shorter here loses to it (or wins only by load order, which is not a thing to rely
- * on). */
 .wp-block-rigpolice-embed .components-placeholder__fieldset .rigpolice-embed__field .components-button {
 	width: 100%;
 	justify-content: space-between;
@@ -49,26 +26,18 @@
 	color: #1e1e1e;
 }
 
-/* The value, not the chevron, is what gives when the field is narrower than the name inside it. */
 .wp-block-rigpolice-embed .rigpolice-embed__value {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
-/* The field's validation line — core's alert red, at the size of the help line below it. Margins are the
- * container's job (both the field and the pair row are flex, with a gap). */
 .wp-block-rigpolice-embed .rigpolice-embed__error {
 	margin: 0;
 	font-size: 12px;
 	color: #cc1818;
 }
 
-/* The converter's two game pickers sit side by side, and wrap when the block is too narrow for both.
- *
- * The child selector is not decoration: a NARROW placeholder (core adds `is-medium`/`is-small`) centers
- * every direct child of its fieldset, which would indent this row away from the tool field above it, and
- * core's rule is three classes deep. `justify-content` therefore has to be said, at that specificity. */
 .wp-block-rigpolice-embed .components-placeholder__fieldset > .rigpolice-embed__pair {
 	display: flex;
 	flex-wrap: wrap;
@@ -78,23 +47,15 @@
 	max-width: 656px;
 }
 
-/* The two share the row — and ONLY in the row: the fields sit in a COLUMN flex fieldset otherwise, where
- * a flex-basis is read as a HEIGHT and stretches the field down the page. `min-width: 0` lets a long game
- * name shrink its field (the value truncates) instead of pushing it past the block. */
 .wp-block-rigpolice-embed .rigpolice-embed__pair .rigpolice-embed__field {
 	flex: 1 1 200px;
 	min-width: 0;
 }
 
-/* The pair's error belongs to both fields, so it takes a line of its own under them rather than growing
- * one of the two columns wider than the other. */
 .wp-block-rigpolice-embed .rigpolice-embed__pair .rigpolice-embed__error {
 	flex-basis: 100%;
 }
 
-/* Matches core's `.components-base-control__label` — the 11px caps BaseControl would have drawn. Names a
- * picker's button in the block, and the search field in the tool picker's popover, so it is deliberately
- * NOT scoped to either document. Margins are the containers' job (both are flex, with a gap). */
 .rigpolice-embed__field-label {
 	font-size: 11px;
 	font-weight: 500;
@@ -103,9 +64,6 @@
 	color: #1e1e1e;
 }
 
-/* Under the pickers, as its own element rather than a control's `help` slot — see index.js. Matches
- * core's help typography, which BaseControl would have supplied. No margin of its own: the fieldset's
- * column gap already spaces it, and a margin on top of that is what made the rhythm uneven. */
 .wp-block-rigpolice-embed .rigpolice-embed__help {
 	margin: 0;
 	font-size: 12px;
@@ -113,20 +71,15 @@
 	color: #757575;
 }
 
-/* Pin the picker's width: the suggestions list renders in flow (core's own layout), so an auto-width
- * popover would resize on every keystroke as the list filters. */
 .rigpolice-embed__picker .components-popover__content {
 	width: 320px;
 	padding: 16px;
 }
 
-/* Core caps the list at 9em — about four rows, a keyhole onto a catalog of twenty-five. Here the list IS
- * the panel, so give it room; past that it scrolls, as core intends. */
 .rigpolice-embed__picker .components-form-token-field__suggestions-list {
 	max-height: 240px;
 }
 
-/* The tool picker's caption row: its label, then the sections, on top of the search field. */
 .rigpolice-embed__picker .rigpolice-embed__caption {
 	display: flex;
 	flex-wrap: wrap;
@@ -136,7 +89,6 @@
 	margin-bottom: 8px;
 }
 
-/* `wrap` lets the chips drop to their own line rather than squeezing the label. */
 .rigpolice-embed__picker .rigpolice-embed__sections {
 	display: flex;
 	flex-wrap: wrap;
@@ -144,23 +96,16 @@
 	row-gap: 4px;
 }
 
-/* Only the underline is overridden — core's `.components-button.is-link` (the `variant: 'link'` buttons
- * below) already sets the accent color, `height: auto` and `padding: 0`, and its color var carries an
- * outer `--wp-components-color-accent` fallback that a local copy would drop. */
 .rigpolice-embed__picker .rigpolice-embed__section {
 	text-decoration: none;
 }
 
-/* The bullet is drawn by the ITEM WRAPPER, never by the button: a ::after on the button renders inside
- * the button's own box, so the separator becomes part of the click target and the focus ring and
- * underline stretch through it. Hanging it off the wrapper puts it outside the button by construction. */
 .rigpolice-embed__picker .rigpolice-embed__section-item:not( :last-child )::after {
 	content: "•";
 	margin: 0 6px;
 	color: #949494;
 }
 
-/* The active section is the current view, not a link to elsewhere — state it, don't just tint it. */
 .rigpolice-embed__picker .rigpolice-embed__section.is-active {
 	color: #1e1e1e;
 	font-weight: 600;
