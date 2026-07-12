@@ -1,14 +1,15 @@
 
 .wp-block-rigpolice-embed .components-placeholder__fieldset {
 	flex-direction: column;
+	flex-wrap: nowrap;
 	align-items: stretch;
+	max-width: 656px;
 }
 
 .wp-block-rigpolice-embed .rigpolice-embed__field {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
-	max-width: 320px;
 }
 
 .wp-block-rigpolice-embed .components-placeholder__fieldset .rigpolice-embed__field .components-button {
@@ -44,7 +45,6 @@
 	justify-content: flex-start;
 	column-gap: 16px;
 	row-gap: 4px;
-	max-width: 656px;
 }
 
 .wp-block-rigpolice-embed .rigpolice-embed__pair .rigpolice-embed__field {
