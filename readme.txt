@@ -74,9 +74,10 @@ Not by default. You can optionally turn on a small credit link under the tool wi
 
 == Screenshots ==
 
-1. The "RigPolice Tool" block: pick a tool from the live dropdown.
-2. The sensitivity converter with a From and To game pair preset.
-3. The CPS test running inside a published post, right where readers land.
+1. One block, every RigPolice test. Search the live catalog or narrow it by section — mouse, monitor, keyboard, audio, gaming, system, mobile — and new tools show up on their own.
+2. Sensitivity converter: preset the From and To game, so readers land straight on the conversion your post is about.
+3. Published. The test runs inside the post, right where readers already are — no download, no sign-up, and the frame resizes itself to fit.
+4. Two settings, and that is the whole plugin: cap the width to match your layout, and decide whether a credit link shows under the tool. It is off unless you turn it on.
 
 == External Services ==
 
