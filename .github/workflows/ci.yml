@@ -33,7 +33,7 @@ jobs:
           node-version: '24'
 
       - name: JavaScript
-        run: npx --yes eslint@9 .
+        run: npx --yes eslint@10 .
 
       - name: CSS
         run: node .github/no-comments-css.mjs

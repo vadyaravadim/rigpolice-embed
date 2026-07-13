@@ -28,7 +28,7 @@ findable and fixable once.
 **The rule: code contains NO comments,** enforced by the `no-comments` CI job — three real parsers, and
 still **zero dependencies** (the repo has no `package.json` and must not get one):
 
-- **JS** (`index.js`, `.github/*.mjs`) — `npx --yes eslint@9 .` against `eslint.config.mjs`, which
+- **JS** (`index.js`, `.github/*.mjs`) — `npx --yes eslint@10 .` against `eslint.config.mjs`, which
   imports nothing and defines the rule inline. `--fix` strips.
 - **CSS** (`editor.css`) — `.github/no-comments-css.mjs`, a quote-aware scanner (`content: "/*"` is legal
   CSS, so a regex would cut from inside a string).
