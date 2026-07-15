@@ -4,6 +4,7 @@ A **zero-build** WordPress Gutenberg block that embeds free [RigPolice](https://
 tools — mouse, monitor, keyboard, click, and network testers — into any post or page. Pick a tool,
 publish, and the widget loads in its own frame and auto-resizes to fit.
 
+[![WordPress.org plugin](https://img.shields.io/wordpress/plugin/v/rigpolice-embed.svg?label=WordPress.org)](https://wordpress.org/plugins/rigpolice-embed/)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPL_v2+-blue.svg)](LICENSE)
 ![WordPress 6.3+](https://img.shields.io/badge/WordPress-6.3+-21759b.svg)
 ![PHP 7.4+](https://img.shields.io/badge/PHP-7.4+-777bb4.svg)
@@ -24,11 +25,15 @@ publish, and the widget loads in its own frame and auto-resizes to fit.
 
 ## Installation
 
-### From a release (recommended)
+### From the WordPress.org directory (recommended)
+
+1. In WordPress: **Plugins → Add New**, search for **“RigPolice Embed”**, then **Install** and **Activate**. Or install it straight from the [plugin's directory page](https://wordpress.org/plugins/rigpolice-embed/).
+2. Edit a post or page, add the **“RigPolice Tool”** block, and pick a tool.
+
+### From a GitHub release
 
 1. Download the latest `rigpolice-embed.zip` from the [Releases](../../releases) page.
 2. In WordPress: **Plugins → Add New → Upload Plugin**, choose the zip, **Install**, then **Activate**.
-3. Edit a post or page, add the **“RigPolice Tool”** block, and pick a tool.
 
 ### Manual
 
@@ -80,6 +85,7 @@ one-off local test build, `zip -r rigpolice-embed.zip rigpolice-embed` from a cl
 
 ## Links
 
+- WordPress.org plugin page: <https://wordpress.org/plugins/rigpolice-embed/>
 - Embed hub & tool catalog: <https://rigpolice.com/embed-tools/>
 - For video creators: <https://rigpolice.com/for-creators/>
 
