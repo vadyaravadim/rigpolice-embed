@@ -4,7 +4,7 @@ Tags: gaming, speed test, calculator, interactive, diagnostics
 Requires at least: 6.3
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.4.9
+Stable tag: 1.4.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,7 +62,7 @@ The block requires the WordPress block editor (Gutenberg). On sites running the 
 
 = Will it slow my site down? =
 
-No. Each tool loads in its own frame, and only when the reader scrolls near it, so your content paints first. The loader script is tiny, cached, and shared by every embed on the page.
+No. Each tool loads in its own frame, and the frame is lazy-loaded, so most browsers hold off fetching it until the reader scrolls near and your content paints first. The loader script is tiny, cached, and shared by every embed on the page.
 
 = Do my readers get tracked? =
 
@@ -94,6 +94,10 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.10 =
+* Corrected the "Show credit link" toggle's sidebar description: the credit shows in exactly one place, not two. With the toggle on, a credit link shows under the tool and the frame hides its own; with it off, the frame keeps its own small credit. The old text wrongly implied the frame always shows branding on top of the optional link. Editor-only wording, nothing about the embedded tool changed.
+* Softened the performance FAQ to match how the frame actually loads: it is lazy-loaded, so most browsers defer fetching it until the reader scrolls near, rather than that being a hard guarantee. Wording only.
 
 = 1.4.9 =
 * Fixed the block growing a strip of empty space in the editor once the sensitivity converter had both of its games picked: the two game fields stretched to twice their height for no reason. Editor-only, nothing about the embedded tool changed.
