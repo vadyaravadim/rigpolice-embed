@@ -295,7 +295,7 @@
 					el( cmp.ToggleControl, {
 						label: __( 'Show credit link to RigPolice', 'rigpolice-embed' ),
 						help: __(
-							'Off by default. Turn on to add a small dofollow credit link under the tool. The tool always shows RigPolice branding inside its own frame.',
+							'Off by default. Turn it on to show a credit link to RigPolice under the tool; leave it off and the tool keeps its own small credit inside the frame instead.',
 							'rigpolice-embed'
 						),
 						checked: !! showcredit,
