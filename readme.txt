@@ -4,7 +4,7 @@ Tags: gaming, speed test, calculator, interactive, diagnostics
 Requires at least: 6.3
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.4.9
+Stable tag: 1.4.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -94,6 +94,9 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.10 =
+* Corrected the "Show credit link" toggle's sidebar description: the credit shows in exactly one place, not two. With the toggle on, a credit link shows under the tool and the frame hides its own; with it off, the frame keeps its own small credit. The old text wrongly implied the frame always shows branding on top of the optional link. Editor-only wording, nothing about the embedded tool changed.
 
 = 1.4.9 =
 * Fixed the block growing a strip of empty space in the editor once the sensitivity converter had both of its games picked: the two game fields stretched to twice their height for no reason. Editor-only, nothing about the embedded tool changed.
