@@ -12,13 +12,15 @@ publish, and the widget loads in its own frame and auto-resizes to fit.
 
 ## Features
 
-- **30+ embeddable tools**, fetched **live** from `rigpolice.com` — a tool added on the site appears in
-  the block automatically, so the plugin and the site can never drift.
+- **Every embeddable RigPolice tool**, fetched **live** from `rigpolice.com` — a tool added on the site
+  appears in the block automatically, so the plugin and the site can never drift.
 - **Sensitivity-converter game-pair preset** (e.g. CS:GO → Valorant) so the embedded converter opens on
   the conversion your post covers.
-- **Auto-resizing frame** — no fixed height, no inner scrollbar; the widget reports its height over
-  `postMessage`.
-- **No credit link by default** — opt in per embed to a small **dofollow** credit link; the tool always shows RigPolice branding inside its own frame.
+- **Auto-resizing frame** — it opens at the tool's default height, then the widget reports its real
+  height over `postMessage`; no inner scrollbar, no height to maintain.
+- **No credit link by default** — opt in per embed to a small **dofollow** credit link under the tool;
+  opting in also tells the frame to hide its own credit, so RigPolice is credited in exactly one place
+  either way.
 - **No account, and nothing tracks your readers** — each test runs in the reader's own browser inside its
   own frame.
 - **Zero build step** — no bundler, no npm dependencies, no `@wordpress/scripts`.
@@ -76,12 +78,14 @@ Releases are automated by `.github/workflows/release.yml` (tag-driven). To cut o
 2. Commit, then push a matching tag:
 
    ```bash
-   git tag v1.3.0 && git push origin v1.3.0
+   git tag v1.4.10 && git push origin v1.4.10
    ```
 
-The workflow verifies those two versions equal the tag (fails loud on any mismatch), packages the zip
-(plugin at `rigpolice-embed/rigpolice-embed.php` inside), and publishes a GitHub Release with it. For a
-one-off local test build, `zip -r rigpolice-embed.zip rigpolice-embed` from a clean checkout still works.
+The workflow verifies those two versions equal the tag (fails loud on any mismatch), packages the zip with
+`git archive` (plugin at `rigpolice-embed/rigpolice-embed.php` inside), publishes a GitHub Release with it,
+and in a parallel job deploys the same set to the WordPress.org SVN repo (trunk, `tags/<version>`, and
+`.wordpress-org/*` into `assets/`). For a one-off local build use that same `git archive`: `.gitattributes`
+`export-ignore` is the ONE list scoping what ships, and a plain `zip -r` of a checkout ignores it.
 
 ## Links
 
