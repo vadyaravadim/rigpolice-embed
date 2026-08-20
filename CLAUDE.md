@@ -91,8 +91,10 @@ then tag `vX.Y.Z` and push the tag. Prod deploy is driven by the **tag** (`relea
   **Versions skipped since the last TAG go into the same body** — v1.4.10 carried 1.4.9, which was merged to
   `main` but never tagged, so a reader of the releases page would otherwise never see it. Add the
   developer-facing changes (CI pins, matrix moves, doctrine) under a separate heading; readme.txt's changelog
-  is for authors using the block and deliberately says nothing about them. NOTHING ENFORCES THIS: no gate
-  reds on generated notes, so it is a step OF the release, not optional polish.
+  is for authors using the block and deliberately says nothing about them. The `changelog` job in
+  `release.yml` guarantees the SOURCE exists — a tag whose version has no `= X.Y.Z =` section stops the
+  release before either deploy runs (`.claude/rules/ci.md`) — but nothing can red on a body left as
+  generated, so rewriting it is a step OF the release, not optional polish.
 
 ## Live Preview (WordPress.org Playground demo)
 
