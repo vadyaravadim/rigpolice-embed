@@ -29,6 +29,27 @@ action, the Playground blueprint — live in `CLAUDE.md`. This file is about the
 - **Zero-build stays intact**: no `package.json`, no `composer.json`. wp-env + the browser harness run via
   `npx`/`node`; plugin-check brings its own WordPress.
 
+## The fourth gate lives in `release.yml`: `changelog`
+
+- **It exists because NOTHING else notices a version with no changelog entry.** Plugin Check does not read the
+  changelog at all (grep its `Plugin_Readme_Check` — zero mentions), and `release.yml`'s version step only
+  compares the two version LITERALS against the tag. So `v1.4.11` with no `= 1.4.11 =` section would ship
+  green, and WordPress.org would show a plugin whose changelog never mentions the version people just
+  installed.
+- **It is a JOB, not a step inside `release` — and that is the whole point.** This repo deploys from TWO
+  parallel jobs (`release` → GitHub Release, `wordpress-org` → SVN), both `needs:` the gate. A step-level
+  check inside `release` would fail the GitHub release while the WordPress.org publish went out anyway — and
+  that one is IRREVERSIBLE, the version number is burned. Any future release-blocking check belongs in a job
+  both deploys depend on, for the same reason.
+- **The match is EXACT (`$0 == "= X.Y.Z ="`), never a prefix** — `= 1.4 =` must not be satisfied by
+  `= 1.4.10 =`. Same leak as a word-prefix entry in the comment allowlist (see `CLAUDE.md`).
+- **It checks presence and non-emptiness, not quality.** A one-word section passes. A machine can guarantee
+  that notes were WRITTEN, not that they are good; the writing itself stays a human step (`CLAUDE.md`,
+  release workflow).
+- **Both `readme.txt` and the workflow are read from the TAGGED commit.** Adding the section to `main` after
+  the tag does nothing. Recovery is: add the section, `git tag -d vX.Y.Z`,
+  `git push origin :refs/tags/vX.Y.Z`, tag again — or just ship the next patch version.
+
 ## The matrix — two ends, not every version
 
 - `matrix.wp: [ '6.3', '7.1' ]` = the **floor** (`Requires at least: 6.3` in BOTH `rigpolice-embed.php` and
