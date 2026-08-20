@@ -76,6 +76,23 @@ then tag `vX.Y.Z` and push the tag. Prod deploy is driven by the **tag** (`relea
   --exclude='.*'` only drops DOTfiles, so it silently ships export-ignored non-dotfiles (`CLAUDE.md`,
   `README.md`) in the GitHub zip while WP.org drops them — the artifacts drift and the invariant the
   comments promise quietly becomes false.
+- **The release notes are written BY HAND after the `release` job — never left as generated.** `release.yml`
+  calls `gh release create --generate-notes`, and GitHub's generator lists only merged PULL REQUESTS. Work
+  here lands mostly through LOCAL `--no-ff` merges, which it cannot see: v1.4.8 shipped seven user-facing
+  changes and its release body is a bare compare link. Rewrite the body from readme.txt's changelog — the
+  same text WordPress.org shows, so the two cannot drift:
+
+  ```bash
+  VERSION=1.4.10
+  awk -v want="= $VERSION =" '{sub(/\r$/,"")} $0==want{on=1;next} on&&/^= [0-9]+\.[0-9]+/{exit} on' readme.txt > notes.md
+  gh release edit "v$VERSION" --notes-file notes.md
+  ```
+
+  **Versions skipped since the last TAG go into the same body** — v1.4.10 carried 1.4.9, which was merged to
+  `main` but never tagged, so a reader of the releases page would otherwise never see it. Add the
+  developer-facing changes (CI pins, matrix moves, doctrine) under a separate heading; readme.txt's changelog
+  is for authors using the block and deliberately says nothing about them. NOTHING ENFORCES THIS: no gate
+  reds on generated notes, so it is a step OF the release, not optional polish.
 
 ## Live Preview (WordPress.org Playground demo)
 
