@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '24'
 
@@ -54,7 +54,7 @@ jobs:
           mkdir -p build
           git archive --format=tar --prefix=rigpolice-embed/ HEAD | tar -xf - -C build
 
-      - uses: wordpress/plugin-check-action@v1.1.7
+      - uses: wordpress/plugin-check-action@v1.1.9
         with:
           build-dir: ./build/rigpolice-embed
           ignore-codes: ${{ !inputs.strict-readme && 'outdated_tested_upto_header' || '' }}
@@ -65,7 +65,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        wp: [ '6.3', '7.0' ]
+        wp: [ '6.3', '7.1' ]
     env:
       WP_ENV_CORE: https://wordpress.org/wordpress-${{ matrix.wp }}.zip
       WP_ENV_PHP_VERSION: '8.1'
@@ -73,16 +73,16 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '24'
 
       - name: Start WordPress ${{ matrix.wp }}
-        run: npx --yes @wordpress/env@11.10.0 start
+        run: npx --yes @wordpress/env@11.13.0 start
 
       - name: Confirm the WordPress under test really is ${{ matrix.wp }}
         run: |
-          actual=$(npx --yes @wordpress/env@11.10.0 run cli wp core version 2>/dev/null | tr -d '\r' | grep -E '^[0-9]+\.[0-9]+' | head -1)
+          actual=$(npx --yes @wordpress/env@11.13.0 run cli wp core version 2>/dev/null | tr -d '\r' | grep -E '^[0-9]+\.[0-9]+' | head -1)
           echo "requested=${{ matrix.wp }} actual=$actual"
           case "$actual" in
             ${{ matrix.wp }}|${{ matrix.wp }}.*) ;;
@@ -90,7 +90,7 @@ jobs:
           esac
 
       - name: Render contract (render.php output)
-        run: npx --yes @wordpress/env@11.10.0 run cli wp eval-file wp-content/plugins/rigpolice-embed/.github/render-contract.php
+        run: npx --yes @wordpress/env@11.13.0 run cli wp eval-file wp-content/plugins/rigpolice-embed/.github/render-contract.php
 
       - name: Editor contract (block editor behaviour)
         run: node .github/editor-contract.mjs

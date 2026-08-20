@@ -158,3 +158,30 @@ pickers work against PROD `rigpolice.com` out of the box; the dev mu-plugin no-o
 embeddable set. They require `allow="camera"` / `allow="microphone"` on the iframe; most browsers block
 cross-origin permission prompts inside iframes, and an unexpected camera/mic dialog from an embedded
 widget is alarming or silently fails. Do NOT add them without reconsidering that UX trade-off.
+
+## The readme's promises are claims about a REMOTE bundle
+
+`readme.txt` asserts things this repo cannot enforce — "nothing tracks your readers", the frame is
+lazy-loaded, the credit link is optional, the tool list. All of it lives in `embed.js` and the
+`/embed/<tool>/` pages on rigpolice.com, which ship WITHOUT a plugin release. A sentence that is true today
+can go false with no commit here, while the WordPress.org listing keeps carrying it. Re-verify from the
+source before every release, never from memory:
+
+- `curl -s https://rigpolice.com/embed.js` — the tool map (`k`) is HARDCODED, so a slug missing from it
+  renders NOTHING (which is why the editor's orphan warning must not promise "it still embeds");
+  `iframe.loading="lazy"` is what backs the performance FAQ; `hc` is appended ONLY when the host-DOM credit
+  shows (brand XOR); `rel="noopener"` unless `data-nofollow`, which this plugin never sends, so the opt-in
+  link is dofollow.
+- `curl -sI` both catalogs — `Access-Control-Allow-Origin: *` and `Cache-Control: public, max-age=3600` back
+  the editor's cross-origin fetch and the FAQ's "cached".
+- Open `/embed/<tool>/` in a REAL browser and check `window.umami` / `window.plausible`, `document.cookie`,
+  `localStorage`, and the network panel. **Verified 2026-08-21 for 1.4.10: the shared site bundle DOES ship
+  `analytics.*.js` (events `TestStart`, `OutboundLink`, `JSError`), but it is INERT inside the embed — both
+  tracker globals are undefined, no tracker script loads, nothing is written to cookies or storage, and no
+  XHR leaves the frame.** The privacy sentences hold only while that stays true: loading a tracker into the
+  embed page would silently make the ALREADY-SHIPPED readme false. (`Beacon.*.js` is the logo icon, not a
+  tracking beacon — read a file before believing its name.)
+- What reaches rigpolice.com regardless, as with any third-party embed: the reader's IP, UA, and — under the
+  response's `referrer-policy: strict-origin-when-cross-origin` — the embedding site's ORIGIN, not the post
+  URL. That is why the readme scopes its promise to what **the plugin** sends. Do NOT widen it to "nothing
+  is sent".

@@ -295,7 +295,7 @@
 					el( cmp.ToggleControl, {
 						label: __( 'Show credit link to RigPolice', 'rigpolice-embed' ),
 						help: __(
-							'Off by default. Turn on to add a small dofollow credit link under the tool. The tool always shows RigPolice branding inside its own frame.',
+							'Off by default. Turn it on to show a credit link to RigPolice under the tool; leave it off and the tool keeps its own small credit inside the frame instead.',
 							'rigpolice-embed'
 						),
 						checked: !! showcredit,
@@ -339,7 +339,7 @@
 						__( 'The frame auto-resizes to fit your page.', 'rigpolice-embed' );
 				} else if ( orphaned ) {
 					instructions = __(
-						'The saved tool is no longer in the RigPolice catalog. It still embeds on the page — pick a replacement, or remove the block.',
+						'The saved tool is no longer in the RigPolice catalog. It may no longer load for readers — pick a replacement, or remove the block.',
 						'rigpolice-embed'
 					);
 				} else {
@@ -453,7 +453,7 @@
 							pairError = sprintf(
 								/* translators: %s: comma-separated game slugs that are no longer in the catalog. */
 								__(
-									'%s is no longer in the RigPolice catalog. It still embeds — pick a replacement.',
+									'%s is no longer in the RigPolice catalog. The converter opens on another game instead — pick a replacement.',
 									'rigpolice-embed'
 								),
 								strandedGames.join( ', ' )

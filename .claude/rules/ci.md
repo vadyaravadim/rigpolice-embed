@@ -14,7 +14,7 @@ action, the Playground blueprint — live in `CLAUDE.md`. This file is about the
 
 - **All three are `workflow_call`-able and `release.yml` gates BOTH deploy jobs on them (`needs: ci`)** — a
   tag can never ship code that didn't pass the same checks a branch runs.
-- **`plugin-check`** (`wordpress/plugin-check-action@v1.1.7`) — WordPress.org compliance (escaping, readme,
+- **`plugin-check`** (`wordpress/plugin-check-action@v1.1.9`) — WordPress.org compliance (escaping, readme,
   i18n, guidelines). Catches the class of mistake that gets a release REJECTED by WP.org.
 - **`contracts` / render-contract** (`.github/render-contract.php`) — asserts render.php's OUTPUT through
   `do_blocks()` in a REAL WordPress via `wp eval-file`. `save()` returns null, so render.php IS what readers
@@ -23,7 +23,7 @@ action, the Playground blueprint — live in `CLAUDE.md`. This file is about the
   the real block editor in headless Chrome. **render-contract cannot see `index.js` at all**, and index.js is
   where this block lives (it drives core's Dropdown / Popover / ComboboxControl, whose behavior is
   WP-version-dependent). This is the ONLY gate that would have caught the **1.4.8 `focusOnMount:
-  'firstInputElement'`** regression — a value that exists only in WP 7.0, so on 6.3–6.9 the popover focused
+  'firstInputElement'`** regression — a value that exists only from WP 7.0 on, so on 6.3–6.9 the popover focused
   its own container, the list never expanded, and arrow keys did nothing while every PHP gate stayed green.
   That regression is the reason the matrix exists.
 - **Zero-build stays intact**: no `package.json`, no `composer.json`. wp-env + the browser harness run via
@@ -31,7 +31,7 @@ action, the Playground blueprint — live in `CLAUDE.md`. This file is about the
 
 ## The matrix — two ends, not every version
 
-- `matrix.wp: [ '6.3', '7.0' ]` = the **floor** (`Requires at least: 6.3` in BOTH `rigpolice-embed.php` and
+- `matrix.wp: [ '6.3', '7.1' ]` = the **floor** (`Requires at least: 6.3` in BOTH `rigpolice-embed.php` and
   `readme.txt`) and the **ceiling** (readme's `Tested up to`). In-between versions buy almost nothing: core
   only ADDS component APIs across a range like this, so what bites is using something too NEW — which the
   floor catches.
@@ -52,7 +52,7 @@ action, the Playground blueprint — live in `CLAUDE.md`. This file is about the
   supported set, so a red is the plugin's fault, not the interpreter's.
 - **`node-version: '24'` is a REQUIREMENT, not a preference** — the CDP harness talks over Node's BUILT-IN
   `WebSocket` global (no puppeteer, no playwright), stable only from Node 22.
-- `@wordpress/env@11.10.0` is PINNED like every action here — an unpinned toolchain reds every open branch on
+- `@wordpress/env@11.13.0` is PINNED like every action here — an unpinned toolchain reds every open branch on
   an upstream release with nobody having changed code.
 
 ## The two guards that read backwards
