@@ -69,7 +69,11 @@ then tag `vX.Y.Z` and push the tag. Prod deploy is driven by the **tag** (`relea
 - Deploy: `release.yml` runs two parallel jobs on the tag — a GitHub Release, and a WordPress.org SVN
   deploy via `10up/action-wordpress-plugin-deploy` (syncs trunk scoped by `.gitattributes export-ignore`,
   copies `.wordpress-org/*` into SVN `assets/`, tags `tags/<version>`). Requires repo secrets
-  `SVN_USERNAME` + `SVN_PASSWORD` (the WordPress.org SVN password, not the account password).
+  `SVN_USERNAME` (`rigpolice`, case-sensitive) + `SVN_PASSWORD` (the separate WordPress.org SVN password
+  from the WP.org profile → Account & Security, not the account password); run `gh secret list` before
+  tagging, because a missing secret fails only the SVN job after the GitHub Release is already out. The
+  action is pinned to an exact version: it publishes no floating major tag. WP.org search can take up to
+  72 hours to reflect a release, so a stale listing right after a tag is not a failed deploy.
 - **The GitHub zip is packaged with `git archive`, NOT `rsync` — keep it that way.** `.gitattributes`
   `export-ignore` is the ONE list scoping what ships, and only `git archive` (the zip) and the 10up action
   (the SVN trunk) honor it, which is what makes the two artifacts the identical set. An `rsync -a
