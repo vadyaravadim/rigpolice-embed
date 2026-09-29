@@ -177,10 +177,11 @@ pickers work against PROD `rigpolice.com` out of the box; the dev mu-plugin no-o
 
 ## Tools that are intentionally NOT embeddable
 
-`system-info`, `webcam-test`, `microphone-test`, `spatial-audio-test` are deliberately excluded from the
-embeddable set. They require `allow="camera"` / `allow="microphone"` on the iframe; most browsers block
-cross-origin permission prompts inside iframes, and an unexpected camera/mic dialog from an embedded
-widget is alarming or silently fails. Do NOT add them without reconsidering that UX trade-off.
+RigPolice decides the embeddable set, and this block offers exactly the rows of `embeds.json`, with no slug
+hardcoded. A tool behind a camera, mic or sensor prompt, or an API a cross-origin frame restricts, stays
+out of the catalog: a permission dialog from an embedded widget alarms the reader or silently fails. The
+site repo pins that list in `src/lib/embeds.test.ts`, which fails on a tool that is neither embedded nor
+pinned, so no copy of the list lives here.
 
 ## The readme's promises are claims about a REMOTE bundle
 
