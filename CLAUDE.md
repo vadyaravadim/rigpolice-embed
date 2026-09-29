@@ -199,7 +199,7 @@ source before every release, never from memory:
 - `curl -sI` both catalogs — `Access-Control-Allow-Origin: *` and `Cache-Control: public, max-age=3600` back
   the editor's cross-origin fetch and the FAQ's "cached".
 - Open `/embed/<tool>/` in a REAL browser and check `window.umami` / `window.plausible`, `document.cookie`,
-  `localStorage`, and the network panel. **Verified 2026-08-21 for 1.4.10: the shared site bundle DOES ship
+  `localStorage`, and the network panel. **Verified 2026-09-30 for 1.4.11: the shared site bundle DOES ship
   `analytics.*.js` (events `TestStart`, `OutboundLink`, `JSError`), but it is INERT inside the embed — both
   tracker globals are undefined, no tracker script loads, nothing is written to cookies or storage, and no
   XHR leaves the frame.** The privacy sentences hold only while that stays true: loading a tracker into the
