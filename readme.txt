@@ -85,7 +85,7 @@ This plugin connects to RigPolice (https://rigpolice.com), the service that host
 
 What it loads, and when:
 
-* On the front end, each block outputs a script tag that loads the shared loader script `https://rigpolice.com/embed.js` in the reader's browser. That loader injects the tool's iframe (served from rigpolice.com) and resizes it to fit. The test itself runs inside that iframe, in the reader's own browser.
+* On the front end, each block outputs a script tag that loads a small per-tool loader script from `https://rigpolice.com/embed/<tool>.js` in the reader's browser. That loader injects the tool's iframe (served from rigpolice.com) and resizes it to fit. The test itself runs inside that iframe, in the reader's own browser.
 * In the block editor only, the block fetches `https://rigpolice.com/embeds.json` (the list of embeddable tools) and `https://rigpolice.com/games.json` (the sensitivity-converter game list) to fill the tool and game pickers.
 
 This plugin sends no personal data about you or your readers to RigPolice. The editor requests are plain reads of public catalogs; the front-end loader passes only what you set in the block — the tool you picked, and the converter's game pair when you preset one. Nothing tracks your readers, and the plugin sets no cookies on your site.

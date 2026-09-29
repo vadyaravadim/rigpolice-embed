@@ -20,11 +20,10 @@ $width  = ( isset( $attributes['width'] ) && is_numeric( $attributes['width'] ) 
 
 
 $script_attributes = array(
-	'src'   => 'https://rigpolice.com/embed.js',
+	'src'   => 'https://rigpolice.com/embed/' . rawurlencode( $tool ) . '.js',
 	'async' => true,
 
 
-	'data-tool'   => $tool,
 	'data-anchor' => $anchor,
 );
 

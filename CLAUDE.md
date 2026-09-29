@@ -5,12 +5,12 @@ A dynamic block that lets any WordPress author drop a free RigPolice gear-test t
 iframe from `rigpolice.com` and auto-resizes.
 
 **Decoupled from the RigPolice site on purpose.** Zero-build (plain `wp.*` globals, hand-written
-`index.asset.php`, NO `@wordpress/scripts`, NO npm deps). It loads `embed.js` by absolute URL and depends
+`index.asset.php`, NO `@wordpress/scripts`, NO npm deps). It loads the loader by absolute URL and depends
 on nothing from the site codebase, so it ships and versions independently. It reads two public catalogs
 live in the editor to fill its pickers: `rigpolice.com/embeds.json` (tools) + `rigpolice.com/games.json`
 (converter games), both served with CORS.
 
-**Dynamic block** (`save()` returns `null`): `render.php` emits the `embed.js <script>` server-side so
+**Dynamic block** (`save()` returns `null`): `render.php` emits the loader `<script>` server-side so
 WP's KSES never strips it (a static `save()` output would be filtered for non-admin editors). The editor
 (`index.js`) fetches the two catalogs live to fill the tool + game pickers.
 
@@ -151,7 +151,7 @@ npx --yes @wp-playground/cli@<ver> run-blueprint \
 - `runPHP` `echo` is NOT surfaced to stdout by `run-blueprint`. Have the PHP
   `file_put_contents('/out/result.txt', ...)` into a `--mount`ed host dir, then read it on the host.
 - Assert the real goal: `get_post(4)` created, then `do_blocks($post->post_content)` actually renders the
-  `embed.js <script>` with the right `data-tool`. Dump the raw rendered HTML too — a hand-rolled
+  loader `<script>` with the right `embed/<tool>.js` URL. Dump the raw rendered HTML too — a hand-rolled
   `substr_count('<p>')` false-alarms 0 because WP renders `<p class="wp-block-paragraph">`.
 - Get a RED local repro first (e.g. `INSERT_RESULT=0`, `POST_4_EXISTS=no`), apply the fix, get GREEN
   locally, THEN release.
@@ -186,13 +186,13 @@ pinned, so no copy of the list lives here.
 ## The readme's promises are claims about a REMOTE bundle
 
 `readme.txt` asserts things this repo cannot enforce — "nothing tracks your readers", the frame is
-lazy-loaded, the credit link is optional, the tool list. All of it lives in `embed.js` and the
+lazy-loaded, the credit link is optional, the tool list. All of it lives in the loader and the
 `/embed/<tool>/` pages on rigpolice.com, which ship WITHOUT a plugin release. A sentence that is true today
 can go false with no commit here, while the WordPress.org listing keeps carrying it. Re-verify from the
 source before every release, never from memory:
 
-- `curl -s https://rigpolice.com/embed.js` — the tool map (`k`) is HARDCODED, so a slug missing from it
-  renders NOTHING (which is why the editor's orphan warning must not promise "it still embeds");
+- `curl -s https://rigpolice.com/embed/<tool>.js` — one file per tool with its dimensions baked in, so a
+  slug the site does not serve is a 404 and renders NOTHING (which is why the editor's orphan warning must not promise "it still embeds");
   `iframe.loading="lazy"` is what backs the performance FAQ; `hc` is appended ONLY when the host-DOM credit
   shows (brand XOR); `rel="noopener"` unless `data-nofollow`, which this plugin never sends, so the opt-in
   link is dofollow.
