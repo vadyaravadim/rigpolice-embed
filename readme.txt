@@ -4,7 +4,7 @@ Tags: gaming, speed test, calculator, interactive, diagnostics
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.4.10
+Stable tag: 1.4.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,7 +62,7 @@ The block requires the WordPress block editor (Gutenberg). On sites running the 
 
 = Will it slow my site down? =
 
-No. Each tool loads in its own frame, and the frame is lazy-loaded, so most browsers hold off fetching it until the reader scrolls near and your content paints first. The loader script is tiny, cached, and shared by every embed on the page.
+No. Each tool loads in its own frame, and the frame is lazy-loaded, so most browsers hold off fetching it until the reader scrolls near and your content paints first. The loader script is tiny and cached.
 
 = Do my readers get tracked? =
 
@@ -85,7 +85,7 @@ This plugin connects to RigPolice (https://rigpolice.com), the service that host
 
 What it loads, and when:
 
-* On the front end, each block outputs a script tag that loads the shared loader script `https://rigpolice.com/embed.js` in the reader's browser. That loader injects the tool's iframe (served from rigpolice.com) and resizes it to fit. The test itself runs inside that iframe, in the reader's own browser.
+* On the front end, each block outputs a script tag that loads a small per-tool loader script from `https://rigpolice.com/embed/<tool>.js` in the reader's browser. That loader injects the tool's iframe (served from rigpolice.com) and resizes it to fit. The test itself runs inside that iframe, in the reader's own browser.
 * In the block editor only, the block fetches `https://rigpolice.com/embeds.json` (the list of embeddable tools) and `https://rigpolice.com/games.json` (the sensitivity-converter game list) to fill the tool and game pickers.
 
 This plugin sends no personal data about you or your readers to RigPolice. The editor requests are plain reads of public catalogs; the front-end loader passes only what you set in the block — the tool you picked, and the converter's game pair when you preset one. Nothing tracks your readers, and the plugin sets no cookies on your site.
@@ -94,6 +94,9 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.11 =
+* Each tool now loads from its own small script on rigpolice.com instead of the single shared one, which RigPolice has retired. What your readers see is unchanged: same frame, same sizing, same optional credit link. Update to this version: earlier versions still point at the retired script and show an empty space instead of the tool.
 
 = 1.4.10 =
 * Corrected the "Show credit link" toggle's sidebar description: the credit shows in exactly one place, not two. With the toggle on, a credit link shows under the tool and the frame hides its own; with it off, the frame keeps its own small credit. The old text wrongly implied the frame always shows branding on top of the optional link. Editor-only wording, nothing about the embedded tool changed.

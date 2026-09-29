@@ -34,8 +34,8 @@ rpe_ok( '' === trim( $html ), 'empty tool renders nothing', $html );
 
 
 $html = rpe_render( array( 'tool' => 'test-tool', 'anchor' => 'Test Tool' ) );
-rpe_ok( false !== strpos( $html, 'src="https://rigpolice.com/embed.js"' ), 'emits the embed.js loader', $html );
-rpe_ok( false !== strpos( $html, 'data-tool="test-tool"' ), 'carries data-tool', $html );
+rpe_ok( false !== strpos( $html, 'src="https://rigpolice.com/embed/test-tool.js"' ), 'emits the per-tool loader', $html );
+rpe_ok( false === strpos( $html, 'data-tool' ), 'carries no data-tool (the tool is in the loader URL)', $html );
 rpe_ok( false !== strpos( $html, 'data-anchor="Test Tool"' ), 'carries data-anchor', $html );
 rpe_ok( false !== strpos( $html, 'async' ), 'loader is async', $html );
 

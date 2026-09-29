@@ -43,14 +43,14 @@ Copy the `rigpolice-embed/` folder into `wp-content/plugins/` and activate it fr
 
 ## How it works
 
-The block is **dynamic**: `save()` returns `null` and `render.php` prints the self-locating `embed.js`
-loader `<script>` on the server, so WordPress's KSES filter never strips it (a stored static `<script>`
+The block is **dynamic**: `save()` returns `null` and `render.php` prints the self-locating per-tool loader
+(`embed/<tool>.js`) `<script>` on the server, so WordPress's KSES filter never strips it (a stored static `<script>`
 would be removed for non-admin editors).
 
-The emitted snippet carries `data-tool` and `data-anchor` (plus `data-from`/`data-to` for the sensitivity
+The emitted snippet loads `https://rigpolice.com/embed/<tool>.js` and carries `data-anchor` (plus `data-from`/`data-to` for the sensitivity
 converter, an optional `data-width`, and `data-nocredit` by default — dropped when you opt into the credit
 link). Everything else — the iframe dimensions, `allow` flags, and the credit link's `rel` — lives in
-`embed.js` on `rigpolice.com`, so the block stays tiny and never needs a release to keep up with the site. The editor fetches the tool list from
+the loader on `rigpolice.com`, so the block stays tiny and never needs a release to keep up with the site. The editor fetches the tool list from
 [`/embeds.json`](https://rigpolice.com/embeds.json) and the converter games from
 [`/games.json`](https://rigpolice.com/games.json) live (both send `Access-Control-Allow-Origin: *`).
 
@@ -65,7 +65,7 @@ Zero-build by design: plain `wp.*` globals in `index.js`, dependencies declared 
 | `block.json` | Block metadata (attributes, editor script, dynamic render). |
 | `index.js` | Editor UI (tool picker, size preview, converter pair picker, credit-link toggle). |
 | `index.asset.php` | Hand-written dependency manifest for `index.js` (version read from the plugin header). |
-| `render.php` | Server render → the `embed.js` snippet. |
+| `render.php` | Server render → the loader snippet. |
 | `readme.txt` | WordPress.org-style readme. |
 
 ### Releasing

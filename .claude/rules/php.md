@@ -12,7 +12,7 @@ paths:
 
 - **`if ( ! defined( 'ABSPATH' ) ) { exit; }` tops every PHP file** — including `render.php`, `index.asset.php` and the dev mu-plugin. Blocks direct HTTP access to the file. Keep it in any new PHP file.
 
-- **The block is DYNAMIC on purpose.** `save()` returns `null`; `render.php` emits the `embed.js` `<script>` server-side, so WP's KSES never strips it. A static `save()` output carrying a `<script>` would be filtered away for non-admin editors. Do not "simplify" this into a static save.
+- **The block is DYNAMIC on purpose.** `save()` returns `null`; `render.php` emits the loader `<script>` server-side, so WP's KSES never strips it. A static `save()` output carrying a `<script>` would be filtered away for non-admin editors. Do not "simplify" this into a static save.
 
 - **`wp_get_script_tag()` does ALL the escaping** — `esc_url` on `src`, `esc_attr` on every other attribute, boolean attributes emitted name-only. So the array passed to it needs no manual escaping, and the output carries no literal `<script>` string for KSES to touch. Author-controlled values (`tool`, `anchor`, `from`, `to`) cannot break out of their attribute.
 
@@ -20,14 +20,14 @@ paths:
 
 - **The loader is rendered per block, NOT `wp_enqueue_script()`'d** — it is a third-party loader carrying block-specific `data-*` attributes, so each block instance needs its own tag.
 
-- **Cross-repo wire contract: the `data-*` set `embed.js` on rigpolice.com reads.** Changing any of these breaks the widget without touching this repo's tests unless you also update `.github/render-contract.php` (which pins it by running the real `render.php` through `do_blocks()` in CI, on the WP 6.3 floor and the current release):
-  - `src="https://rigpolice.com/embed.js"` + `async`. The loader is self-locating: it derives the origin for the iframe + brand link from its own `<script src>`.
-  - `data-tool` — the slug. `render.php` never validates it; it goes straight through. An empty `tool` returns `''`: no wrapper div, no loader with an empty `data-tool`.
-  - `data-anchor` — **ALWAYS emitted, even when empty.** `embed.js` reads it with no fallback (iframe title, and the credit-link text when shown). Do NOT wrap it in an `if ( '' !== $anchor )`; an empty anchor is reachable (a tool dropped from `/embeds.json` has no row to bake one from).
-  - `data-from` / `data-to` — the converter game pair, emitted **only when both are set AND differ**, mirroring `embed.js`'s own guard. A stray or half pair desyncs the block from the loader.
-  - `data-width` — optional integer px, only when `> 0`. `embed.js` caps the frame's max-width; height stays auto. Absent means "use the tool's default width", so it must not be emitted when unset.
+- **Cross-repo wire contract: the `data-*` set the loader on rigpolice.com reads.** Changing any of these breaks the widget without touching this repo's tests unless you also update `.github/render-contract.php` (which pins it by running the real `render.php` through `do_blocks()` in CI, on the WP 6.3 floor and the current release):
+  - `src="https://rigpolice.com/embed/<tool>.js"` (the slug, `rawurlencode`d, never validated) + `async`. Each tool has its own loader with its dimensions baked in; there is no shared `embed.js`. The loader is self-locating: it derives the origin for the iframe + brand link from its own `<script src>`.
+  - An empty `tool` returns `''`: no wrapper div, no loader with an empty slug URL. There is no `data-tool`.
+  - `data-anchor` — **ALWAYS emitted, even when empty.** The loader reads it with no fallback (iframe title, and the credit-link text when shown). Do NOT wrap it in an `if ( '' !== $anchor )`; an empty anchor is reachable (a tool dropped from `/embeds.json` has no row to bake one from).
+  - `data-from` / `data-to` — the converter game pair, emitted **only when both are set AND differ**, mirroring the loader's own guard. A stray or half pair desyncs the block from the loader.
+  - `data-width` — optional integer px, only when `> 0`. The loader caps the frame's max-width; height stays auto. Absent means "use the tool's default width", so it must not be emitted when unset.
   - `data-nocredit` — emitted when `showcredit` is falsy, i.e. the host-DOM credit link is **OFF by default**. WP.org Guideline 10 requires credit links to be opt-in; dropping this attribute ships an unsolicited credit link and is a guideline violation, not a cosmetic bug. The tool's own in-frame attribution still credits RigPolice.
-  - Dimensions, iframe `allow` flags, and the brand link's `rel` are owned by `embed.js`'s registry — never re-declare them here.
+  - Dimensions, iframe `allow` flags, and the brand link's `rel` are owned by the loader's registry — never re-declare them here.
 
 - **`rigpolice-embed.php` filters `block_type_metadata` to inject the plugin version into `rigpolice/embed`.** Without it `block.json` carries no `version`, `register_block_style_handle()` registers `editor.css` with `ver=false`, and `WP_Styles` falls back to the *WordPress* version — so the stylesheet URL does not change when the PLUGIN updates and browsers/CDNs keep serving stale CSS (while `index.js` gets the plugin version from `index.asset.php` and updates, i.e. new script against old CSS). Read the version BACK from the header with `get_file_data()`; do NOT add a `version` key to `block.json` — nothing verifies a third copy, so it would silently drift.
 
