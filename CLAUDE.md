@@ -5,7 +5,7 @@ A dynamic block that lets any WordPress author drop a free RigPolice gear-test t
 iframe from `rigpolice.com` and auto-resizes.
 
 **Decoupled from the RigPolice site on purpose.** Zero-build (plain `wp.*` globals, hand-written
-`index.asset.php`, NO `@wordpress/scripts`, NO npm deps). It loads the loader by absolute URL and depends
+`index.asset.php`, NO `@wordpress/scripts`, NO npm deps). It loads each tool's loader from rigpolice.com by absolute URL and depends
 on nothing from the site codebase, so it ships and versions independently. It reads two public catalogs
 live in the editor to fill its pickers: `rigpolice.com/embeds.json` (tools) + `rigpolice.com/games.json`
 (converter games), both served with CORS.
