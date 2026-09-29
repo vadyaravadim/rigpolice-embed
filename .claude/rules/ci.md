@@ -127,7 +127,7 @@ action, the Playground blueprint — live in `CLAUDE.md`. This file is about the
   top-level `$failures` is a local there and a `global` here would bind to an empty global — counts stay 0 and
   the script exits 0 no matter what failed (a test that cannot go red).
 - Pinned output contract: empty `tool` renders NOTHING (no bare wrapper, no loader with an empty slug URL); the loader
-  carries `src="https://rigpolice.com/embed/<tool>.js"` + `data-anchor` + `async` and no `data-tool`; `data-nocredit` is
+  carries `src="https://rigpolice.com/embed/<tool>.js"` + `data-anchor` + `async`; `data-nocredit` is
   present BY DEFAULT (credit link is opt-in — **WP.org Guideline 10**, so dropping it is a guideline violation,
   not a cosmetic bug) and `showcredit` drops it; `data-from`/`data-to` are emitted only when both games are set
   AND differ (the same guard the loader applies); absent `width` emits NO `data-width` (the loader falls back to
