@@ -96,7 +96,7 @@ RigPolice site and contact: https://rigpolice.com/about/
 == Changelog ==
 
 = 1.4.11 =
-* Each tool now loads from its own small script on rigpolice.com instead of the single shared one, which RigPolice has retired. What your readers see is unchanged: same frame, same sizing, same optional credit link. Update to this version: earlier versions still point at the retired script and show an empty space instead of the tool.
+* Each tool loads from its own small script on rigpolice.com. What your readers see is unchanged: same frame, same sizing, same optional credit link. Keep the plugin updated so every embed keeps loading.
 
 = 1.4.10 =
 * Corrected the "Show credit link" toggle's sidebar description: the credit shows in exactly one place, not two. With the toggle on, a credit link shows under the tool and the frame hides its own; with it off, the frame keeps its own small credit. The old text wrongly implied the frame always shows branding on top of the optional link. Editor-only wording, nothing about the embedded tool changed.
