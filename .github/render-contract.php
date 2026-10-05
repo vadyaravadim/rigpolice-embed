@@ -67,9 +67,10 @@ rpe_ok( false === strpos( $html, 'data-width' ), 'absent width emits no data-wid
 
 
 
-$html = rpe_render( array( 'tool' => 'x" onload="alert(1)' ) );
+$html = rpe_render( array( 'tool' => 'x" onload="alert(1)', 'from' => 'a" onload="alert(2)', 'to' => 'game-b' ) );
 rpe_ok( false === strpos( $html, 'onload="alert(1)"' ), 'quote in tool cannot break out of the attribute', $html );
-rpe_ok( false !== strpos( $html, '&quot;' ), 'quotes are escaped', $html );
+rpe_ok( false === strpos( $html, 'onload="alert(2)"' ), 'quote in a game cannot break out of data-from', $html );
+rpe_ok( false !== strpos( $html, 'data-from="a&quot;' ), 'quotes in data-from are escaped', $html );
 
 $tally = rpe_ok( null );
 echo "\n{$tally['passed']} passed, {$tally['failed']} failed\n";

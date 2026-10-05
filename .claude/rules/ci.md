@@ -131,8 +131,8 @@ action, the Playground blueprint — live in `CLAUDE.md`. This file is about the
   present BY DEFAULT (credit link is opt-in — **WP.org Guideline 10**, so dropping it is a guideline violation,
   not a cosmetic bug) and `showcredit` drops it; `data-from`/`data-to` are emitted only when both games are set
   AND differ (the same guard the loader applies); absent `width` emits NO `data-width` (the loader falls back to
-  the tool's default only when the attribute is missing); a quote in `tool` cannot break out
-  (`esc_attr` via `wp_get_script_tag()`).
+  the tool's default only when the attribute is missing); a quote in `tool` (`rawurlencode`d) or in a game
+  (`esc_attr` via `wp_get_script_tag()`) cannot break out; a game is the case that proves `&quot;`.
 
 ## `editor-contract.mjs` invariants
 
