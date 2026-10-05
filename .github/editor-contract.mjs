@@ -12,10 +12,10 @@ const PASS = 'password';
 const PROFILE = mkdtempSync( join( tmpdir(), 'rpe-editor-contract-' ) );
 
 const EMBEDS = [
-	{ slug: 'mouse-test', title: 'Mouse Test', category: 'mouse', anchor: 'Mouse tester', width: 640, height: 480 },
-	{ slug: 'cps-test', title: 'CPS Test', category: 'mouse', anchor: 'CPS checker', width: 640, height: 480 },
-	{ slug: 'key-test', title: 'Keyboard Test', category: 'keyboard', anchor: 'Keyboard tester', width: 640, height: 480 },
-	{ slug: 'sens-converter', title: 'Sensitivity Converter', category: 'mouse', anchor: 'Converter', preset: 'pair', width: 640, height: 480 },
+	{ slug: 'mouse-test', title: 'Mouse Test', category: 'mouse', width: 640, height: 480 },
+	{ slug: 'cps-test', title: 'CPS Test', category: 'mouse', width: 640, height: 480 },
+	{ slug: 'key-test', title: 'Keyboard Test', category: 'keyboard', width: 640, height: 480 },
+	{ slug: 'sens-converter', title: 'Sensitivity Converter', category: 'mouse', preset: 'pair', width: 640, height: 480 },
 ];
 const GAMES = [
 	{ slug: 'csgo', name: 'CS:GO' },
@@ -336,7 +336,6 @@ async function main() {
 			return b ? b.attributes : null;
 		` );
 		ok( !! attrs && !! attrs.tool, 'Enter commits the highlighted tool', JSON.stringify( attrs ) );
-		ok( !! attrs && !! attrs.anchor, 'the picked tool bakes its anchor into the block', JSON.stringify( attrs ) );
 
 		console.log( `\n${ passed } passed, ${ failed } failed` );
 		process.exit( failed > 0 ? 1 : 0 );

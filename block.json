@@ -14,7 +14,6 @@
 	},
 	"attributes": {
 		"tool": { "type": "string", "default": "" },
-		"anchor": { "type": "string", "default": "" },
 		"showcredit": { "type": "boolean", "default": false },
 		"from": { "type": "string", "default": "" },
 		"to": { "type": "string", "default": "" },

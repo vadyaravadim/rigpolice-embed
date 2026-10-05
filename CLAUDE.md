@@ -54,6 +54,12 @@ the rule. If a fact seems to need a comment, that is the signal it belongs in a 
 Rules: `.claude/rules/editor.md` (index.js / editor.css), `.claude/rules/php.md` (render.php / the plugin
 entry), `.claude/rules/ci.md` (the gates and the contract harnesses).
 
+## Copy standard
+
+User-facing English (editor strings, `readme.txt`, the blueprint demo post) follows the rigpolice.com
+standard: simple American English, no em or en dashes, no marketing clichés; a number (CPS ranges and the
+like) matches the one the site pins. Past changelog entries stay as shipped.
+
 ## Release workflow — branch → merge → tag
 
 Work on a feature branch (e.g. `release/x.y.z`), merge into `main` (`--no-ff` keeps the release legible),
@@ -173,7 +179,7 @@ pickers work against PROD `rigpolice.com` out of the box; the dev mu-plugin no-o
   mu-plugin, so nothing extra leaks into `mu-plugins/`.
 - Assert `render.php`'s real output server-side (`wp eval 'echo do_blocks(get_post(N)->post_content);'`)
   instead of eyeballing the page — it shows the exact `data-*` set, and `wp_get_script_tag()` escapes every
-  attribute (`esc_attr`), so injected quotes in `tool`/`anchor`/`from` cannot break out.
+  attribute (`esc_attr`), so injected quotes in `tool`/`from` cannot break out.
 
 ## Tools that are intentionally NOT embeddable
 

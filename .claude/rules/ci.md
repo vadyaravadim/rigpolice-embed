@@ -122,21 +122,17 @@ action, the Playground blueprint — live in `CLAUDE.md`. This file is about the
   passes it straight into the loader URL — so a real catalog slug proves nothing extra and would red the suite
   whenever a tool is renamed on rigpolice.com.
 - **Assertions match SUBSTRINGS, never a whole tag**: `wp_get_script_tag()` SORTS the attributes it emits
-  (async, data-anchor, data-nocredit, src) and that order is core's business.
+  (async, data-nocredit, src) and that order is core's business.
 - **Tallies live in a `static`, NOT in globals.** `wp eval-file` runs the file inside a function scope, so a
   top-level `$failures` is a local there and a `global` here would bind to an empty global — counts stay 0 and
   the script exits 0 no matter what failed (a test that cannot go red).
 - Pinned output contract: empty `tool` renders NOTHING (no bare wrapper, no loader with an empty slug URL); the loader
-  carries `src="https://rigpolice.com/embed/<tool>.js"` + `data-anchor` + `async`; `data-nocredit` is
+  carries `src="https://rigpolice.com/embed/<tool>.js"` + `async` and no `data-anchor`, even from a legacy saved `anchor` attribute; `data-nocredit` is
   present BY DEFAULT (credit link is opt-in — **WP.org Guideline 10**, so dropping it is a guideline violation,
   not a cosmetic bug) and `showcredit` drops it; `data-from`/`data-to` are emitted only when both games are set
   AND differ (the same guard the loader applies); absent `width` emits NO `data-width` (the loader falls back to
-  the tool's default only when the attribute is missing); a quote in `tool`/`anchor` cannot break out
+  the tool's default only when the attribute is missing); a quote in `tool` cannot break out
   (`esc_attr` via `wp_get_script_tag()`).
-- **`data-anchor` is asserted present even when EMPTY** — the loader reads it with no fallback, an empty anchor
-  is reachable (a tool dropped from the catalog has no row to bake one from), and every OTHER assertion passes
-  a non-empty anchor, so without this case a regression wrapping it in `if ( '' !== $anchor )` would go
-  unnoticed.
 
 ## `editor-contract.mjs` invariants
 
@@ -157,7 +153,7 @@ action, the Playground blueprint — live in `CLAUDE.md`. This file is about the
   `input[role=combobox]`, not on a section chip**; a **discriminator** assertion proves a chip really IS the
   popover's first tabbable (so core's own `focusOnMount` would land there and the test can actually fail); and
   the suggestion list is expanded on open with no typing. Then ArrowDown moves `aria-activedescendant`, and
-  Enter commits both `tool` and `anchor` into the block attributes.
+  Enter commits `tool` into the block attributes.
 - The tool-picker wait is wrapped so a timeout reports WHY (block registered? blocks in editor? canvas found?
   placeholder text?) — a bare "timed out" is almost always either an unregistered block or a stub that didn't
   take.

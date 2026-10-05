@@ -18,7 +18,7 @@ publish, and the widget loads in its own frame and auto-resizes to fit.
   the conversion your post covers.
 - **Auto-resizing frame** — it opens at the tool's default height, then the widget reports its real
   height over `postMessage`; no inner scrollbar, no height to maintain.
-- **No credit link by default** — opt in per embed to a small **dofollow** credit link under the tool;
+- **No credit link by default**: opt in per embed to a small credit link under the tool;
   opting in also tells the frame to hide its own credit, so RigPolice is credited in exactly one place
   either way.
 - **No account, and nothing tracks your readers** — each test runs in the reader's own browser inside its
@@ -47,9 +47,9 @@ The block is **dynamic**: `save()` returns `null` and `render.php` prints the se
 (`embed/<tool>.js`) `<script>` on the server, so WordPress's KSES filter never strips it (a stored static `<script>`
 would be removed for non-admin editors).
 
-The emitted snippet loads `https://rigpolice.com/embed/<tool>.js` and carries `data-anchor` (plus `data-from`/`data-to` for the sensitivity
-converter, an optional `data-width`, and `data-nocredit` by default — dropped when you opt into the credit
-link). Everything else — the iframe dimensions, `allow` flags, and the credit link's `rel` — lives in
+The emitted snippet loads `https://rigpolice.com/embed/<tool>.js` and carries `data-from`/`data-to` for the sensitivity
+converter, an optional `data-width`, and `data-nocredit` by default (dropped when you opt into the credit
+link). Everything else (the iframe dimensions, `allow` flags, the credit text and its `rel`) lives in
 the loader on `rigpolice.com`, so the block stays tiny and never needs a release to keep up with the site. The editor fetches the tool list from
 [`/embeds.json`](https://rigpolice.com/embeds.json) and the converter games from
 [`/games.json`](https://rigpolice.com/games.json) live (both send `Access-Control-Allow-Origin: *`).

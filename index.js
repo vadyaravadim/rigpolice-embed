@@ -339,7 +339,7 @@
 						__( 'The frame auto-resizes to fit your page.', 'rigpolice-embed' );
 				} else if ( orphaned ) {
 					instructions = __(
-						'The saved tool is no longer in the RigPolice catalog. It may no longer load for readers — pick a replacement, or remove the block.',
+						'The saved tool is no longer in the RigPolice catalog. It may no longer load for readers. Pick a replacement, or remove the block.',
 						'rigpolice-embed'
 					);
 				} else {
@@ -399,7 +399,7 @@
 					emptyLabel: __( 'Choose a tool', 'rigpolice-embed' ),
 					error: tool
 						? null
-						: __( 'Required — the block embeds nothing until a tool is picked.', 'rigpolice-embed' ),
+						: __( 'Required: the block embeds nothing until a tool is picked.', 'rigpolice-embed' ),
 					options: toolOptions,
 					placeholder: __( 'Search tools…', 'rigpolice-embed' ),
 					onChange: function ( value ) {
@@ -407,14 +407,7 @@
 							return;
 						}
 
-						var next = { tool: value || '', from: '', to: '' };
-
-						var picked = findBySlug( tools, value );
-						if ( picked ) {
-							next.anchor = picked.anchor;
-						}
-
-						setAttributes( next );
+						setAttributes( { tool: value || '', from: '', to: '' } );
 
 						if ( value ) {
 							setCategory( '' );
@@ -441,19 +434,19 @@
 						var pairError = null;
 						if ( ! from || ! to ) {
 							pairError = __(
-								'Required — without both games the converter embeds with no preset.',
+								'Required: without both games, the converter embeds with no preset.',
 								'rigpolice-embed'
 							);
 						} else if ( from === to ) {
 							pairError = __(
-								'Pick two different games — while both ends match, the converter embeds with no preset.',
+								'Pick two different games. While both ends match, the converter embeds with no preset.',
 								'rigpolice-embed'
 							);
 						} else if ( strandedGames.length ) {
 							pairError = sprintf(
 								/* translators: %s: comma-separated game slugs that are no longer in the catalog. */
 								__(
-									'%s is no longer in the RigPolice catalog. The converter opens on another game instead — pick a replacement.',
+									'%s is no longer in the RigPolice catalog. The converter opens on another game instead. Pick a replacement.',
 									'rigpolice-embed'
 								),
 								strandedGames.join( ', ' )

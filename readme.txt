@@ -36,7 +36,7 @@ Support, bugs, and ideas are all welcome:
 * The plugin's support forum here on WordPress.org
 * RigPolice site and contact: https://rigpolice.com/about/
 
-Thanks for giving it a try. — RigPolice
+Thanks for giving it a try.
 
 == Installation ==
 
@@ -74,9 +74,9 @@ Not by default. You can optionally turn on a small credit link under the tool wi
 
 == Screenshots ==
 
-1. One block, every RigPolice test. Search the live catalog or narrow it by section — mouse, monitor, keyboard, audio, gaming, system, mobile — and new tools show up on their own.
+1. One block, every RigPolice test. Search the live catalog or narrow it by section (mouse, monitor, keyboard, audio, gaming, system, mobile), and new tools show up on their own.
 2. Sensitivity converter: preset the From and To game, so readers land straight on the conversion your post is about.
-3. Published. The test runs inside the post, right where readers already are — no download, no sign-up, and the frame resizes itself to fit.
+3. Published. The test runs inside the post, right where readers already are. No download, no sign-up, and the frame resizes itself to fit.
 4. Two settings, and that is the whole plugin: cap the width to match your layout, and decide whether a credit link shows under the tool. It is off unless you turn it on.
 
 == External Services ==
@@ -88,7 +88,7 @@ What it loads, and when:
 * On the front end, each block outputs a script tag that loads a small per-tool loader script from `https://rigpolice.com/embed/<tool>.js` in the reader's browser. That loader injects the tool's iframe (served from rigpolice.com) and resizes it to fit. The test itself runs inside that iframe, in the reader's own browser.
 * In the block editor only, the block fetches `https://rigpolice.com/embeds.json` (the list of embeddable tools) and `https://rigpolice.com/games.json` (the sensitivity-converter game list) to fill the tool and game pickers.
 
-This plugin sends no personal data about you or your readers to RigPolice. The editor requests are plain reads of public catalogs; the front-end loader passes only what you set in the block — the tool you picked, and the converter's game pair when you preset one. Nothing tracks your readers, and the plugin sets no cookies on your site.
+This plugin sends no personal data about you or your readers to RigPolice. The editor requests are plain reads of public catalogs; the front-end loader passes only what you set in the block: the tool you picked, and the converter's game pair when you preset one. Nothing tracks your readers, and the plugin sets no cookies on your site.
 
 RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
