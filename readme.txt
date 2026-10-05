@@ -4,7 +4,7 @@ Tags: gaming, speed test, calculator, interactive, diagnostics
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.4.11
+Stable tag: 1.4.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,7 +28,7 @@ The plugin is open source (GPL-2.0-or-later). Source and issues: https://github.
 
 Hi, I'm the developer behind RigPolice. I built these gear tests because I kept wanting a quick, honest way to check a mouse, keyboard, or monitor without installing anything or handing over an email, and I figured other people did too. They're free, they run entirely in your reader's browser, and this block just lets you drop them where they're actually useful, inside your own posts. That's the whole idea: no accounts, no tracking, no upsell.
 
-If it helps you or your readers, I'd genuinely love to hear about it, and an honest review on this page means a lot to a small project like this.
+If it helps you or your readers, I'd genuinely love to hear about it, and [an honest review](https://wordpress.org/support/plugin/rigpolice-embed/reviews/#new-post) means a lot to a small project like this.
 
 Support, bugs, and ideas are all welcome:
 
@@ -36,7 +36,7 @@ Support, bugs, and ideas are all welcome:
 * The plugin's support forum here on WordPress.org
 * RigPolice site and contact: https://rigpolice.com/about/
 
-Thanks for giving it a try. — RigPolice
+Thanks for giving it a try.
 
 == Installation ==
 
@@ -74,9 +74,9 @@ Not by default. You can optionally turn on a small credit link under the tool wi
 
 == Screenshots ==
 
-1. One block, every RigPolice test. Search the live catalog or narrow it by section — mouse, monitor, keyboard, audio, gaming, system, mobile — and new tools show up on their own.
+1. One block, every RigPolice test. Search the live catalog or narrow it by section (mouse, monitor, keyboard, audio, gaming, system, mobile), and new tools show up on their own.
 2. Sensitivity converter: preset the From and To game, so readers land straight on the conversion your post is about.
-3. Published. The test runs inside the post, right where readers already are — no download, no sign-up, and the frame resizes itself to fit.
+3. Published. The test runs inside the post, right where readers already are. No download, no sign-up, and the frame resizes itself to fit.
 4. Two settings, and that is the whole plugin: cap the width to match your layout, and decide whether a credit link shows under the tool. It is off unless you turn it on.
 
 == External Services ==
@@ -88,12 +88,18 @@ What it loads, and when:
 * On the front end, each block outputs a script tag that loads a small per-tool loader script from `https://rigpolice.com/embed/<tool>.js` in the reader's browser. That loader injects the tool's iframe (served from rigpolice.com) and resizes it to fit. The test itself runs inside that iframe, in the reader's own browser.
 * In the block editor only, the block fetches `https://rigpolice.com/embeds.json` (the list of embeddable tools) and `https://rigpolice.com/games.json` (the sensitivity-converter game list) to fill the tool and game pickers.
 
-This plugin sends no personal data about you or your readers to RigPolice. The editor requests are plain reads of public catalogs; the front-end loader passes only what you set in the block — the tool you picked, and the converter's game pair when you preset one. Nothing tracks your readers, and the plugin sets no cookies on your site.
+This plugin sends no personal data about you or your readers to RigPolice. The editor requests are plain reads of public catalogs; the front-end loader passes only what you set in the block: the tool you picked, and the converter's game pair when you preset one. Nothing tracks your readers, and the plugin sets no cookies on your site.
 
 RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.12 =
+* Added one line at the bottom of the block sidebar with a link to rate the plugin on WordPress.org. It shows only in the editor, never to your readers.
+* The block no longer saves the credit text into your posts. RigPolice sets it itself, so the optional credit link always reads "RigPolice". Blocks you already published keep working with no changes.
+* Clearer wording in the editor warnings and in this readme.
+* The Live Preview demo post now quotes the click speed most people reach, 6 to 8 clicks per second, matching the RigPolice CPS test.
 
 = 1.4.11 =
 * Each tool loads from its own small script on rigpolice.com. What your readers see is unchanged: same frame, same sizing, same optional credit link. Keep the plugin updated so every embed keeps loading.
