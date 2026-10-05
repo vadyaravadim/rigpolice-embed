@@ -8,7 +8,7 @@ paths:
 
 # RigPolice Embed — PHP (render.php / plugin entry)
 
-- **Comments a MACHINE reads — never delete these, they are not prose.** The `/** Plugin Name: ... Version: ... Text Domain: ... */` header in `rigpolice-embed.php` (WordPress parses it to see the plugin at all, and `get_file_data()` reads `Version` back from it); the `// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped` / `// phpcs:enable` pair around the `printf` in `render.php` (the Plugin Check CI job reads them); the file-level `@package` docblock in every PHP file (WPCS / Plugin Check require it). Any `/* translators: */` comment added later is likewise load-bearing — the i18n extractor pulls it into the `.pot`.
+- **Comments a MACHINE reads — never delete these, they are not prose.** The `/** Plugin Name: ... Version: ... Text Domain: ... */` header in `rigpolice-embed.php` (WordPress parses it to see the plugin at all, and `get_file_data()` reads `Version` back from it); the `// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped` / `// phpcs:enable` pair around the `printf` in `render.php` (the Plugin Check CI job reads them). No other docblock exists or may be added: the plugin header carries the one `@package` tag, Plugin Check passes without a per-file docblock, and `.github/no-comments.php` rejects one. Any `/* translators: */` comment added later is likewise load-bearing — the i18n extractor pulls it into the `.pot`.
 
 - **`if ( ! defined( 'ABSPATH' ) ) { exit; }` tops every PHP file** — including `render.php`, `index.asset.php` and the dev mu-plugin. Blocks direct HTTP access to the file. Keep it in any new PHP file.
 
