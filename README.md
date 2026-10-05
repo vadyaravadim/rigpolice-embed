@@ -90,6 +90,7 @@ and in a parallel job deploys the same set to the WordPress.org SVN repo (trunk,
 ## Links
 
 - WordPress.org plugin page: <https://wordpress.org/plugins/rigpolice-embed/>
+- Rate the plugin: <https://wordpress.org/support/plugin/rigpolice-embed/reviews/#new-post>
 - Embed hub & tool catalog: <https://rigpolice.com/embed-tools/>
 - For video creators: <https://rigpolice.com/for-creators/>
 

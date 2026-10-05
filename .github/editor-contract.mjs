@@ -337,6 +337,21 @@ async function main() {
 		` );
 		ok( !! attrs && !! attrs.tool, 'Enter commits the highlighted tool', JSON.stringify( attrs ) );
 
+		await cdp.eval( `
+			wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
+			return true;
+		` );
+		await sleep( 500 );
+		const review = await cdp.eval( `
+			const a = document.querySelector( '.rigpolice-embed__review a' );
+			return { href: a ? a.getAttribute( 'href' ) : null, inCanvas: !! document.querySelector( 'iframe[name="editor-canvas"]' ).contentDocument.querySelector( '.rigpolice-embed__review' ) };
+		` );
+		ok(
+			review.href === 'https://wordpress.org/support/plugin/rigpolice-embed/reviews/#new-post' && ! review.inCanvas,
+			'the block sidebar, and only the sidebar, links to the WordPress.org review form',
+			JSON.stringify( review )
+		);
+
 		console.log( `\n${ passed } passed, ${ failed } failed` );
 		process.exit( failed > 0 ? 1 : 0 );
 	} catch ( e ) {

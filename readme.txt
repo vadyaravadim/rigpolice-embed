@@ -28,7 +28,7 @@ The plugin is open source (GPL-2.0-or-later). Source and issues: https://github.
 
 Hi, I'm the developer behind RigPolice. I built these gear tests because I kept wanting a quick, honest way to check a mouse, keyboard, or monitor without installing anything or handing over an email, and I figured other people did too. They're free, they run entirely in your reader's browser, and this block just lets you drop them where they're actually useful, inside your own posts. That's the whole idea: no accounts, no tracking, no upsell.
 
-If it helps you or your readers, I'd genuinely love to hear about it, and an honest review on this page means a lot to a small project like this.
+If it helps you or your readers, I'd genuinely love to hear about it, and [an honest review](https://wordpress.org/support/plugin/rigpolice-embed/reviews/#new-post) means a lot to a small project like this.
 
 Support, bugs, and ideas are all welcome:
 

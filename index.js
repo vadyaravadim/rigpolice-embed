@@ -17,6 +17,7 @@
 	var EMBEDS_URL = 'https://rigpolice.com/embeds.json';
 	var GAMES_URL = 'https://rigpolice.com/games.json';
 	var TOOLS_PAGE_URL = 'https://rigpolice.com/embed-tools/';
+	var REVIEW_URL = 'https://wordpress.org/support/plugin/rigpolice-embed/reviews/#new-post';
 	var LABEL = __( 'RigPolice Tool', 'rigpolice-embed' );
 
 	var TOOLS_PAGE_HELP = createInterpolateElement(
@@ -25,6 +26,11 @@
 			'rigpolice-embed'
 		),
 		{ a: el( cmp.ExternalLink, { href: TOOLS_PAGE_URL } ) }
+	);
+
+	var REVIEW_HELP = createInterpolateElement(
+		__( 'Finding this block useful? <a>Rate it on WordPress.org</a> so other site owners can find it too.', 'rigpolice-embed' ),
+		{ a: el( cmp.ExternalLink, { href: REVIEW_URL } ) }
 	);
 
 	function fetchJson( url, onOk, onErr ) {
@@ -304,7 +310,8 @@
 						},
 						__nextHasNoMarginBottom: true,
 					} )
-				)
+				),
+				el( cmp.PanelBody, null, el( 'p', { className: 'rigpolice-embed__review' }, REVIEW_HELP ) )
 			);
 
 			var body;
