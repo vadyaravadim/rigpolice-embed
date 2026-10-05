@@ -4,7 +4,7 @@ Tags: gaming, speed test, calculator, interactive, diagnostics
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.4.11
+Stable tag: 1.4.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -94,6 +94,12 @@ RigPolice privacy policy: https://rigpolice.com/privacy/
 RigPolice site and contact: https://rigpolice.com/about/
 
 == Changelog ==
+
+= 1.4.12 =
+* Added one line at the bottom of the block sidebar with a link to rate the plugin on WordPress.org. It shows only in the editor, never to your readers.
+* The block no longer saves the credit text into your posts. RigPolice sets it itself, so the optional credit link always reads "RigPolice". Blocks you already published keep working with no changes.
+* Clearer wording in the editor warnings and in this readme.
+* The Live Preview demo post now quotes the click speed most people reach, 6 to 8 clicks per second, matching the RigPolice CPS test.
 
 = 1.4.11 =
 * Each tool loads from its own small script on rigpolice.com. What your readers see is unchanged: same frame, same sizing, same optional credit link. Keep the plugin updated so every embed keeps loading.
