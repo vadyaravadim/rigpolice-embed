@@ -54,7 +54,7 @@ foreach ( $files as $file ) {
 }
 
 if ( $failures ) {
-	fwrite( STDERR, "PHP comments are not allowed. Put the WHY in .claude/rules/ or CLAUDE.md.\n\n" );
+	fwrite( STDERR, "PHP comments are not allowed. Put the WHY in .agents/rules/ or AGENTS.md.\n\n" );
 	foreach ( $failures as $f ) {
 		fwrite( STDERR, '  ' . $f . "\n" );
 	}

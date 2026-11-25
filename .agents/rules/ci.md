@@ -8,7 +8,7 @@ paths:
 # RigPolice Embed — CI gates and contract harnesses
 
 (Release mechanics — tag-driven deploy, the two version literals, `git archive` vs rsync, the 10up SVN
-action, the Playground blueprint — live in `CLAUDE.md`. This file is about the GATES.)
+action, the Playground blueprint — live in `AGENTS.md`. This file is about the GATES.)
 
 ## The three gates (`ci.yml`)
 
@@ -42,9 +42,9 @@ action, the Playground blueprint — live in `CLAUDE.md`. This file is about the
   that one is IRREVERSIBLE, the version number is burned. Any future release-blocking check belongs in a job
   both deploys depend on, for the same reason.
 - **The match is EXACT (`$0 == "= X.Y.Z ="`), never a prefix** — `= 1.4 =` must not be satisfied by
-  `= 1.4.10 =`. Same leak as a word-prefix entry in the comment allowlist (see `CLAUDE.md`).
+  `= 1.4.10 =`. Same leak as a word-prefix entry in the comment allowlist (see `AGENTS.md`).
 - **It checks presence and non-emptiness, not quality.** A one-word section passes. A machine can guarantee
-  that notes were WRITTEN, not that they are good; the writing itself stays a human step (`CLAUDE.md`,
+  that notes were WRITTEN, not that they are good; the writing itself stays a human step (`AGENTS.md`,
   release workflow).
 - **Both `readme.txt` and the workflow are read from the TAGGED commit.** Adding the section to `main` after
   the tag does nothing. Recovery is: add the section, `git tag -d vX.Y.Z`,
@@ -95,7 +95,7 @@ action, the Playground blueprint — live in `CLAUDE.md`. This file is about the
 - The job runs `git archive --format=tar --prefix=rigpolice-embed/ HEAD | tar -xf - -C build` and points
   `build-dir` at `./build/rigpolice-embed`. So the checker sees exactly what ships, scoped by the ONE list
   (`.gitattributes` `export-ignore`) — the same command `release.yml` packages the zip with.
-- Pointing it at the working tree would make it see `CLAUDE.md` / `.github` / `.wp-env` (files that never
+- Pointing it at the working tree would make it see `AGENTS.md` / `.github` / `.wp-env` (files that never
   ship) and force a SECOND exclude list here, free to drift from the first.
 - `.gitattributes`: everything NOT listed **does ship** (LICENSE, readme.txt, rigpolice-embed.php, render.php,
   block.json, index.js, index.asset.php, editor.css). `.wordpress-org` is export-ignored from trunk on purpose

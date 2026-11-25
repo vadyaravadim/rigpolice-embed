@@ -17,13 +17,13 @@ WP's KSES never strips it (a static `save()` output would be filtered for non-ad
 ## Core principle — the code carries no comments
 
 **Where does an invariant live so it reaches whoever is about to break it?** Not in a `//` beside the
-code. It goes into `.claude/rules/*.md` (path-scoped, auto-loaded when a matching file is read) or into
-this file. The knowledge is not deleted, it is RELOCATED to where it is read.
+code. It goes into `.agents/rules/*.md` or into this file. The knowledge is not deleted, it is RELOCATED to
+where it is read.
 
-Why, and it is not taste: a comment is seen only if an agent happens to open that exact line, while a
-path-scoped rule enters its context BEFORE the edit. A comment also rots silently — the code moves, the
-comment keeps describing the old shape, and nothing turns red. A rule is ONE place, so a stale one is
-findable and fixable once.
+Why, and it is not taste: a comment is seen only if an agent happens to open that exact line, while a rule is
+**read before the edit**: the table below maps every file to its rule, and before editing a file you read the
+rule(s) mapped to it. A comment also rots silently — the code moves, the comment keeps describing the old
+shape, and nothing turns red. A rule is ONE place, so a stale one is findable and fixable once.
 
 **The rule: code contains NO comments,** enforced by the `no-comments` CI job — three real parsers, and
 still **zero dependencies** (the repo has no `package.json` and must not get one):
@@ -47,12 +47,20 @@ syntax, not commentary; deleting one breaks the platform, not the style:
 leaks (in the sibling repo an entry for the `global` directive let a comment opening "global handler
 with…" survive a full strip). Match the exact directive.
 
-**What this obliges you to do:** write a change's rationale into the matching `.claude/rules/*.md` in the
+**What this obliges you to do:** write a change's rationale into the matching `.agents/rules/*.md` in the
 SAME edit; never leave a comment-only block empty; never make a generator emit comments; never disable
 the rule. If a fact seems to need a comment, that is the signal it belongs in a rule file.
 
-Rules: `.claude/rules/editor.md` (index.js / editor.css), `.claude/rules/php.md` (render.php / the plugin
-entry), `.claude/rules/ci.md` (the gates and the contract harnesses).
+**Before editing a file, read the rule(s) mapped to it:**
+
+| File | Read first |
+| --- | --- |
+| `.github/**`, `.gitattributes`, `.wp-env.json` | `.agents/rules/ci.md` |
+| `index.js`, `editor.css`, `block.json` | `.agents/rules/editor.md` |
+| `render.php`, `rigpolice-embed.php`, `.wp-env/**` | `.agents/rules/php.md` |
+| `index.asset.php` | `.agents/rules/editor.md` and `.agents/rules/php.md` |
+
+The `paths:` frontmatter in each rule file is the source; the table must change with it.
 
 ## Copy standard
 
@@ -83,7 +91,7 @@ then tag `vX.Y.Z` and push the tag. Prod deploy is driven by the **tag** (`relea
 - **The GitHub zip is packaged with `git archive`, NOT `rsync` — keep it that way.** `.gitattributes`
   `export-ignore` is the ONE list scoping what ships, and only `git archive` (the zip) and the 10up action
   (the SVN trunk) honor it, which is what makes the two artifacts the identical set. An `rsync -a
-  --exclude='.*'` only drops DOTfiles, so it silently ships export-ignored non-dotfiles (`CLAUDE.md`,
+  --exclude='.*'` only drops DOTfiles, so it silently ships export-ignored non-dotfiles (`AGENTS.md`,
   `README.md`) in the GitHub zip while WP.org drops them — the artifacts drift and the invariant the
   comments promise quietly becomes false.
 - **The release notes are written BY HAND after the `release` job — never left as generated.** `release.yml`
@@ -103,7 +111,7 @@ then tag `vX.Y.Z` and push the tag. Prod deploy is driven by the **tag** (`relea
   developer-facing changes (CI pins, matrix moves, doctrine) under a separate heading; readme.txt's changelog
   is for authors using the block and deliberately says nothing about them. The `changelog` job in
   `release.yml` guarantees the SOURCE exists — a tag whose version has no `= X.Y.Z =` section stops the
-  release before either deploy runs (`.claude/rules/ci.md`) — but nothing can red on a body left as
+  release before either deploy runs (`.agents/rules/ci.md`) — but nothing can red on a body left as
   generated, so rewriting it is a step OF the release, not optional polish.
 
 ## Live Preview (WordPress.org Playground demo)

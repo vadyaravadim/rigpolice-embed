@@ -72,7 +72,7 @@ for (const rel of FILES) {
 
 if (failures) {
   console.error(
-    `\nCSS comments are not allowed. Put the WHY in .claude/rules/ or CLAUDE.md.\n${failures} comment(s).`,
+    `\nCSS comments are not allowed. Put the WHY in .agents/rules/ or AGENTS.md.\n${failures} comment(s).`,
   );
   process.exitCode = 1;
 } else if (!FIX) {
