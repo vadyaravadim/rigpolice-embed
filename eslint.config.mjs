@@ -1,7 +1,7 @@
 const ALLOWED = /^\s*(eslint-disable|eslint-enable|translators:)/;
 
 const NO_COMMENTS =
-  'Comments are not allowed. Put the WHY in .claude/rules/ or CLAUDE.md, not next to the code.';
+  'Comments are not allowed. Put the WHY in .agents/rules/ or AGENTS.md, not next to the code.';
 
 function cutRange(text, start, end) {
   let s = start;

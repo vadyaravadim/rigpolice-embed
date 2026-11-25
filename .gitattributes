@@ -8,7 +8,7 @@
 /.wp-env                export-ignore
 /.wp-env.json           export-ignore
 /.wp-env.override.json  export-ignore
-/.claude                export-ignore
+/.agents                export-ignore
 /eslint.config.mjs      export-ignore
 /README.md              export-ignore
-/CLAUDE.md              export-ignore
+/AGENTS.md              export-ignore
